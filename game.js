@@ -49,15 +49,16 @@ function makeSignal(speed) {
 }
 
 function createCar(roadWidth, direction) {
-    //var originalY = direction ? -g.randomInt(-100, canvasH) : g.randomInt(0, canvasH + 100); 
-    var originalY = 0; 
+    var carHeight = canvasH * 0.25;
+    var carWidth = canvasW * 0.15;
+    var originalY = direction ? -carHeight : canvasH + carHeight; 
     var car = g.rectangle(
-        100, 
-        200, 
-        "green", 
+        carWidth, 
+        carHeight,
+        direction ? "green" : "white", 
         "", 
         0,
-        300,
+        direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW  / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05,
         originalY); 
     
     car.vx = 0;
@@ -98,9 +99,9 @@ function createSignalBar() {
 
 function setup() {
     var roadWidth = 0.6;
-    var numberOfSignals = 10;
+    var numberOfSignals = 3;
     var signalCreationInterval = 1000;
-    var numberOfCars = 1;
+    var numberOfCars = 2;
     signals = [];
     cars = [];
     score = 0;
@@ -111,8 +112,8 @@ function setup() {
     
     road = g.rectangle(canvasW * roadWidth, canvasH, "black", "", 0, canvasW * ((1 - roadWidth) / 2), 0);
     gameScene.addChild(road);
-    for (let i = 1; i <= numberOfCars; i++) {
-        createCar(roadWidth, Math.max(1, i % 2));
+    for (let i = 0; i < numberOfCars; i++) {
+        createCar(roadWidth, i % 2);
     }
 
     player = g.rectangle(canvasW * 0.05, canvasW * 0.08, "rebeccapurple", "", 0, canvasW * 0.01, canvasH * 0.5);
@@ -144,9 +145,10 @@ function setup() {
 
 function restartSignal(signal) {
     signal.x = g.randomInt(0, canvasW);
-    signal.y = 0;
+    signal.y =  g.randomInt(0, canvasH);
     signal.vx = signal.speed * getDirection();
     signal.vy = signal.speed * getDirection();
+    ga.fadeIn(signal, 360);
 }
 
 function play() {
@@ -158,7 +160,7 @@ function play() {
     cars.forEach(function (car) {
         g.move(car);
 
-        var carHitsEdges = g.contain(car, g.stage.localBounds);
+        var carHitsEdges = (car.originalY < canvasH && car.y > canvasH) || car.y < -car.height;
 
         if (carHitsEdges) {
             car.y = car.originalY;
@@ -182,8 +184,12 @@ function play() {
         signal.x += signal.vx;
         signal.y += signal.vy;
 
-        if (g.contain(signal, g.stage.localBounds)) {
-            restartSignal(signal);            
+        var signalHitsEdges = g.contain(signal, g.stage.localBounds);
+
+        if (signalHitsEdges === "top" || signalHitsEdges === "bottom") {
+            signal.vy *= -1;
+        } else if (signalHitsEdges === "right" || signalHitsEdges === "left") {
+            signal.vx *= -1;
         }
 
         if (g.hitTestCircleRectangle(signal, player)) {
@@ -194,8 +200,10 @@ function play() {
     });
 
     var now = Date.now();
-    if (!signalHit && (now - lastTime) > 1000) {
-        signalBar.inner.width = Math.max(0, signalBar.width - signalBar.width / signalBar.numberOfSegments);
+    if ((now - lastTime) > 1000) {
+        if (!signalHit) {
+            signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
+        } 
         lastTime = now;
     }
 
