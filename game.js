@@ -18,9 +18,12 @@ var player,
     canvasW = g.canvas.width,
     canvasH = g.canvas.height,
     signalSpeed = 2,
-    fieldDecayTime = 1000,
+    signalIterval = 2000,
+    fieldDecayTime = 700,
     numberOfSignals = 3,
-    lastTime = Date.now();
+    numberOfCars = 4,
+    carHitPenalty = 1.5,
+    lastTime;
 ;
 
 function getDirection() {
@@ -50,10 +53,12 @@ function makeSignal(speed) {
     gameScene.addChild(signal);
 }
 
-function createCar(roadWidth, direction) {
+function createCar(roadWidth, carNumber) {
+    var direction = carNumber % 2;
     var carHeight = canvasH * 0.25;
     var carWidth = canvasW * 0.15;
     var originalY = direction ? -carHeight : canvasH + carHeight; 
+    var verticalSpacing = carNumber > 1 && Math.floor(carNumber / 2) * carHeight + canvasH * 0.3 || 0
     var car = g.rectangle(
         carWidth, 
         carHeight,
@@ -61,7 +66,7 @@ function createCar(roadWidth, direction) {
         "", 
         0,
         direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW  / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05,
-        originalY); 
+        verticalSpacing); 
     
     car.vx = 0;
     car.vy = direction ? 2 : -2;
@@ -103,8 +108,6 @@ function createSignalBar() {
 
 function setup() {
     var roadWidth = 0.6;
-    var signalCreationInterval = 1000;
-    var numberOfCars = 2;
     signals = [];
     cars = [];
     score = 0;
@@ -116,21 +119,24 @@ function setup() {
     road = g.rectangle(canvasW * roadWidth, canvasH, "black", "", 0, canvasW * ((1 - roadWidth) / 2), 0);
     gameScene.addChild(road);
     for (let i = 0; i < numberOfCars; i++) {
-        createCar(roadWidth, i % 2);
+        createCar(roadWidth, i);
     }
 
     player = g.rectangle(canvasW * 0.05, canvasW * 0.08, "rebeccapurple", "", 0, canvasW * 0.01, canvasH * 0.5);
     g.fourKeyController(player, 5, 38, 39, 40, 37);
 
-    scoreDisplay = g.text("score:" + score, "20px impact", "black", 400, 10);
+    scoreDisplay = g.text("score:" + score, "20px impact", "black", canvasW * 0.01, canvasW * 0.005);
     gameScene.add(scoreDisplay, player);
 
     var signalCreationInterval = setInterval(function() {
+        if (!lastTime) {
+            lastTime = Date.now();
+        }
         makeSignal(signalSpeed);
         if (signals.length >= numberOfSignals) {
             clearInterval(signalCreationInterval);
         }
-    }, signalCreationInterval);
+    }, signalIterval);
 
     createHealthBar();
     createSignalBar();
@@ -176,7 +182,7 @@ function play() {
 
     if (playerHit) {
         player.alpha = 0.5;
-        healthBar.inner.width -= 1;
+        healthBar.inner.width -= carHitPenalty;
     } else {
         player.alpha = 1;
     }
