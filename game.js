@@ -18,6 +18,8 @@ var player,
     canvasW = g.canvas.width,
     canvasH = g.canvas.height,
     signalSpeed = 2,
+    fieldDecayTime = 1000,
+    numberOfSignals = 3,
     lastTime = Date.now();
 ;
 
@@ -70,9 +72,10 @@ function createCar(roadWidth, direction) {
 
 function createHealthBar() {
     var outerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "black"),
-        innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "yellowGreen");
+        innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "yellowGreen"),
+        text = g.text("energy", "15px arial", "black", 0, 0);
 
-    healthBar = g.group(outerBar, innerBar);
+    healthBar = g.group(outerBar, innerBar, text);
 
     healthBar.inner = innerBar;
 
@@ -84,9 +87,10 @@ function createHealthBar() {
 
 function createSignalBar() {
     var outerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "black"),
-        innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "red");
+        innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "red"),
+        text = g.text("signal", "15px arial", "black", 0, 0);
 
-    signalBar = g.group(outerBar, innerBar);
+    signalBar = g.group(outerBar, innerBar, text);
 
     signalBar.inner = innerBar;
     signalBar.maxWidth = signalBar.width;
@@ -99,7 +103,6 @@ function createSignalBar() {
 
 function setup() {
     var roadWidth = 0.6;
-    var numberOfSignals = 3;
     var signalCreationInterval = 1000;
     var numberOfCars = 2;
     signals = [];
@@ -124,7 +127,7 @@ function setup() {
 
     var signalCreationInterval = setInterval(function() {
         makeSignal(signalSpeed);
-        if (signals.length > numberOfSignals) {
+        if (signals.length >= numberOfSignals) {
             clearInterval(signalCreationInterval);
         }
     }, signalCreationInterval);
@@ -148,7 +151,7 @@ function restartSignal(signal) {
     signal.y =  g.randomInt(0, canvasH);
     signal.vx = signal.speed * getDirection();
     signal.vy = signal.speed * getDirection();
-    ga.fadeIn(signal, 360);
+    g.fadeIn(signal, 360);
 }
 
 function play() {
@@ -200,7 +203,7 @@ function play() {
     });
 
     var now = Date.now();
-    if ((now - lastTime) > 1000) {
+    if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
             signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
         } 
