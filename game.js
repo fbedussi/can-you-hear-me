@@ -13,6 +13,7 @@ var player,
         600, 600, setup,
         [
             'images/signal.png',
+            'images/player.png',
         ]
     ),
     canvasW = g.canvas.width,
@@ -21,7 +22,7 @@ var player,
     signalIterval = 2000,
     fieldDecayTime = 700,
     numberOfSignals = 3,
-    numberOfCars = 4,
+    numberOfCars = 2,
     carHitPenalty = 1.5,
     lastTime;
 ;
@@ -57,17 +58,17 @@ function createCar(roadWidth, carNumber) {
     var direction = carNumber % 2;
     var carHeight = canvasH * 0.25;
     var carWidth = canvasW * 0.15;
-    var originalY = direction ? -carHeight : canvasH + carHeight; 
+    var originalY = direction ? -carHeight : canvasH + carHeight;
     var verticalSpacing = carNumber > 1 && Math.floor(carNumber / 2) * carHeight + canvasH * 0.3 || 0
     var car = g.rectangle(
-        carWidth, 
+        carWidth,
         carHeight,
-        direction ? "green" : "white", 
-        "", 
+        direction ? "white" : "white",
+        "",
         0,
-        direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW  / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05,
-        verticalSpacing); 
-    
+        direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05,
+        verticalSpacing);
+
     car.vx = 0;
     car.vy = direction ? 2 : -2;
     car.originalY = originalY;
@@ -115,20 +116,80 @@ function setup() {
     g.backgroundColor = "gray";
 
     gameScene = g.group();
-    
+
     road = g.rectangle(canvasW * roadWidth, canvasH, "black", "", 0, canvasW * ((1 - roadWidth) / 2), 0);
     gameScene.addChild(road);
     for (let i = 0; i < numberOfCars; i++) {
         createCar(roadWidth, i);
     }
 
-    player = g.rectangle(canvasW * 0.05, canvasW * 0.08, "rebeccapurple", "", 0, canvasW * 0.01, canvasH * 0.5);
-    g.fourKeyController(player, 5, 38, 39, 40, 37);
+    var walkingAnimation = g.filmstrip('images/player.png', 30, 30);
+    player = g.sprite(walkingAnimation);
+    player.setPosition(0, 100);
+    player.states = {
+        up: 0,
+        left: 7,
+        down: 3,
+        right: 4,
+        walkUp: [0, 2],
+        walkLeft: [5, 7],
+        walkDown: [1, 3],
+        walkRight: [4, 6]
+    };
+    player.show(player.states.right);
+    leftArrow = g.keyboard(37);
+    upArrow = g.keyboard(38);
+    rightArrow = g.keyboard(39);
+    downArrow = g.keyboard(40);
+    leftArrow.press = function () {
+        player.playSequence(player.states.walkLeft);
+        player.vx = -1;
+        player.vy = 0;
+    };
+    leftArrow.release = function () {
+        if (!rightArrow.isDown && player.vy === 0) {
+            player.vx = 0;
+            player.show(player.states.left);
+        }
+    };
+    upArrow.press = function () {
+        player.playSequence(player.states.walkUp);
+        player.vy = -1;
+        player.vx = 0;
+    };
+    upArrow.release = function () {
+        if (!downArrow.isDown && player.vx === 0) {
+            player.vy = 0;
+            player.show(player.states.up);
+        }
+    };
+    rightArrow.press = function () {
+        player.playSequence(player.states.walkRight);
+        player.vx = 1;
+        player.vy = 0;
+    };
+    rightArrow.release = function () {
+        if (!leftArrow.isDown && player.vy === 0) {
+            player.vx = 0;
+            player.show(player.states.right);
+        }
+    };
+    downArrow.press = function () {
+        player.playSequence(player.states.walkDown);
+        player.vy = 1;
+        player.vx = 0;
+    };
+    downArrow.release = function () {
+        if (!upArrow.isDown && player.vx === 0) {
+            player.vy = 0;
+            player.show(player.states.down);
+        }
+    };
 
     scoreDisplay = g.text("score:" + score, "20px impact", "black", canvasW * 0.01, canvasW * 0.005);
     gameScene.add(scoreDisplay, player);
 
-    var signalCreationInterval = setInterval(function() {
+    var signalCreationInterval = setInterval(function () {
         if (!lastTime) {
             lastTime = Date.now();
         }
@@ -144,7 +205,7 @@ function setup() {
     message = g.text("Game Over!", "64px impact", "black", 120, g.canvas.height / 2 - 64);
     totalScore = g.text("", "25px impact", "black", 180, g.canvas.height / 2 + 20);
     var replay = g.text("click to replay", "32px impact", "black", 175, g.canvas.height / 2 + 64);
-    
+
     gameOverScene = g.group(message, totalScore, replay);
 
     gameOverScene.visible = false;
@@ -154,7 +215,7 @@ function setup() {
 
 function restartSignal(signal) {
     signal.x = g.randomInt(0, canvasW);
-    signal.y =  g.randomInt(0, canvasH);
+    signal.y = g.randomInt(0, canvasH);
     signal.vx = signal.speed * getDirection();
     signal.vy = signal.speed * getDirection();
     g.fadeIn(signal, 360);
@@ -211,8 +272,8 @@ function play() {
     var now = Date.now();
     if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
-            signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
-        } 
+            //signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
+        }
         lastTime = now;
     }
 
@@ -226,7 +287,7 @@ function end() {
     totalScore.content = "total score: " + score;
     gameScene.visible = false;
     gameOverScene.visible = true;
-    window.addEventListener('click', function() {
+    window.addEventListener('click', function () {
         window.location.reload();
     });
 }
