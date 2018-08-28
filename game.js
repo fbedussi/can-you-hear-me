@@ -10,20 +10,23 @@ var player,
     healthBar,
     signalBar,
     g = ga(
-        600, 600, setup,
+        300, 300, setup,
         [
+            'images/background.png',
             'images/signal.png',
-            'images/player.png',
+            'images/bob.png',
+            'images/car.png',
+            'images/car2.png',
         ]
     ),
     canvasW = g.canvas.width,
     canvasH = g.canvas.height,
     signalSpeed = 2,
     signalIterval = 2000,
-    fieldDecayTime = 700,
-    numberOfSignals = 3,
-    numberOfCars = 2,
-    carHitPenalty = 1.5,
+    fieldDecayTime = 1000,
+    numberOfSignals = 4,
+    numberOfCars = 4,
+    carHitPenalty = 0.1,
     lastTime;
 ;
 
@@ -56,18 +59,13 @@ function makeSignal(speed) {
 
 function createCar(roadWidth, carNumber) {
     var direction = carNumber % 2;
-    var carHeight = canvasH * 0.25;
-    var carWidth = canvasW * 0.15;
+    var car = g.sprite(`images/car${direction ? '2' : ''}.png`);
+    var carHeight = car.height;
+    var carWidth = car.width;
     var originalY = direction ? -carHeight : canvasH + carHeight;
-    var verticalSpacing = carNumber > 1 && Math.floor(carNumber / 2) * carHeight + canvasH * 0.3 || 0
-    var car = g.rectangle(
-        carWidth,
-        carHeight,
-        direction ? "white" : "white",
-        "",
-        0,
-        direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05,
-        verticalSpacing);
+    var verticalSpacing = carNumber > 1 && Math.floor(carNumber / 2) * carHeight + canvasH * 0.4 || 0
+    car. x = direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05;
+    car.y = verticalSpacing;
 
     car.vx = 0;
     car.vy = direction ? 2 : -2;
@@ -79,7 +77,7 @@ function createCar(roadWidth, carNumber) {
 function createHealthBar() {
     var outerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "black"),
         innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "yellowGreen"),
-        text = g.text("energy", "15px arial", "black", 0, 0);
+        text = g.text("energy", "10px arial", "black", 0, 0);
 
     healthBar = g.group(outerBar, innerBar, text);
 
@@ -94,7 +92,7 @@ function createHealthBar() {
 function createSignalBar() {
     var outerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "black"),
         innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "red"),
-        text = g.text("signal", "15px arial", "black", 0, 0);
+        text = g.text("signal", "10px arial", "black", 0, 0);
 
     signalBar = g.group(outerBar, innerBar, text);
 
@@ -109,6 +107,7 @@ function createSignalBar() {
 
 function setup() {
     var roadWidth = 0.6;
+    var playerVelocity = 2;
     signals = [];
     cars = [];
     score = 0;
@@ -117,24 +116,26 @@ function setup() {
 
     gameScene = g.group();
 
-    road = g.rectangle(canvasW * roadWidth, canvasH, "black", "", 0, canvasW * ((1 - roadWidth) / 2), 0);
-    gameScene.addChild(road);
+    // road = g.rectangle(canvasW * roadWidth, canvasH, "black", "", 0, canvasW * ((1 - roadWidth) / 2), 0);
+    // gameScene.addChild(road);
+    var background = g.sprite('images/background.png');
+    gameScene.addChild(background);
     for (let i = 0; i < numberOfCars; i++) {
         createCar(roadWidth, i);
     }
 
-    var walkingAnimation = g.filmstrip('images/player.png', 30, 30);
+    var walkingAnimation = g.filmstrip('images/bob.png', 32, 32);
     player = g.sprite(walkingAnimation);
     player.setPosition(0, 100);
     player.states = {
-        up: 0,
-        left: 7,
+        up: 7,
+        left: 15,
         down: 3,
-        right: 4,
-        walkUp: [0, 2],
-        walkLeft: [5, 7],
-        walkDown: [1, 3],
-        walkRight: [4, 6]
+        right: 11,
+        walkUp: [4, 7],
+        walkLeft: [12, 15],
+        walkDown: [0, 3],
+        walkRight: [8, 11]
     };
     player.show(player.states.right);
     leftArrow = g.keyboard(37);
@@ -143,7 +144,7 @@ function setup() {
     downArrow = g.keyboard(40);
     leftArrow.press = function () {
         player.playSequence(player.states.walkLeft);
-        player.vx = -1;
+        player.vx = -playerVelocity;
         player.vy = 0;
     };
     leftArrow.release = function () {
@@ -154,7 +155,7 @@ function setup() {
     };
     upArrow.press = function () {
         player.playSequence(player.states.walkUp);
-        player.vy = -1;
+        player.vy = -playerVelocity;
         player.vx = 0;
     };
     upArrow.release = function () {
@@ -165,7 +166,7 @@ function setup() {
     };
     rightArrow.press = function () {
         player.playSequence(player.states.walkRight);
-        player.vx = 1;
+        player.vx = playerVelocity;
         player.vy = 0;
     };
     rightArrow.release = function () {
@@ -176,7 +177,7 @@ function setup() {
     };
     downArrow.press = function () {
         player.playSequence(player.states.walkDown);
-        player.vy = 1;
+        player.vy = playerVelocity;
         player.vx = 0;
     };
     downArrow.release = function () {
@@ -186,7 +187,7 @@ function setup() {
         }
     };
 
-    scoreDisplay = g.text("score:" + score, "20px impact", "black", canvasW * 0.01, canvasW * 0.005);
+    scoreDisplay = g.text("score:" + score, "10px impact", "black", canvasW * 0.01, canvasW * 0.005);
     gameScene.add(scoreDisplay, player);
 
     var signalCreationInterval = setInterval(function () {
@@ -202,9 +203,9 @@ function setup() {
     createHealthBar();
     createSignalBar();
 
-    message = g.text("Game Over!", "64px impact", "black", 120, g.canvas.height / 2 - 64);
-    totalScore = g.text("", "25px impact", "black", 180, g.canvas.height / 2 + 20);
-    var replay = g.text("click to replay", "32px impact", "black", 175, g.canvas.height / 2 + 64);
+    message = g.text("Game Over!", "30px impact", "black", 85, g.canvas.height / 2 - 64);
+    totalScore = g.text("", "15px impact", "black", 110, g.canvas.height / 2);
+    var replay = g.text("click to replay", "15px impact", "black", 112, g.canvas.height / 2 + 40);
 
     gameOverScene = g.group(message, totalScore, replay);
 
@@ -223,7 +224,11 @@ function restartSignal(signal) {
 
 function play() {
     g.move(player);
-    g.contain(player, g.stage.localBounds)
+    g.contain(player, {
+        x: 18, y: 0,
+        width: g.canvas.width - 18,
+        height: g.canvas.height
+      })
 
     var playerHit = false;
 
@@ -264,7 +269,9 @@ function play() {
 
         if (g.hitTestCircleRectangle(signal, player)) {
             signalHit = true;
-            signalBar.inner.width = Math.max(signalBar.maxWidth, signalBar.width + signalBar.width / signalBar.numberOfSegments);
+            signalBar.inner.width = Math.min(signalBar.maxWidth, signalBar.width + signalBar.width / signalBar.numberOfSegments);
+            score += 10;
+            scoreDisplay.content = "score: " + score;
             restartSignal(signal);
         }
     });
@@ -272,7 +279,7 @@ function play() {
     var now = Date.now();
     if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
-            //signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
+            signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
         }
         lastTime = now;
     }
