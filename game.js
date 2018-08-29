@@ -64,7 +64,7 @@ function createCar(roadWidth, carNumber) {
     var carWidth = car.width;
     var originalY = direction ? -carHeight : canvasH + carHeight;
     var verticalSpacing = carNumber > 1 && Math.floor(carNumber / 2) * carHeight + canvasH * 0.4 || 0
-    car. x = direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05;
+    car.x = direction ? (canvasW - (canvasW * roadWidth)) / 2 + canvasW * 0.05 : (canvasW / 2) + (canvasW * roadWidth / 2) - carWidth - canvasW * 0.05;
     car.y = verticalSpacing;
 
     car.vx = 0;
@@ -203,15 +203,33 @@ function setup() {
     createHealthBar();
     createSignalBar();
 
-    message = g.text("Game Over!", "30px impact", "black", 85, g.canvas.height / 2 - 64);
-    totalScore = g.text("", "15px impact", "black", 110, g.canvas.height / 2);
-    var replay = g.text("click to replay", "15px impact", "black", 112, g.canvas.height / 2 + 40);
+    message = g.text("Game Over!", "30px monospace", "black", 85, g.canvas.height / 2 - 64);
+    totalScore = g.text("", "15px monospace", "black", 110, g.canvas.height / 2);
+    var replay = g.text("click or enter to replay", "15px monospace", "black", 50, g.canvas.height / 2 + 40);
 
     gameOverScene = g.group(message, totalScore, replay);
 
     gameOverScene.visible = false;
 
     g.state = play;
+
+
+    window_focus = false;
+    window.onblur = function () { 
+        window_focus = false; 
+        muteMusic();
+    }
+    window.onfocus = function () { 
+        window_focus = true; 
+        muteMusic();
+        playAt(150)
+    }
+
+    if (window_focus) {
+        playAt(150)
+    } else {
+        muteMusic();
+    }
 }
 
 function restartSignal(signal) {
@@ -228,7 +246,7 @@ function play() {
         x: 18, y: 0,
         width: g.canvas.width - 18,
         height: g.canvas.height
-      })
+    })
 
     var playerHit = false;
 
@@ -279,7 +297,7 @@ function play() {
     var now = Date.now();
     if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
-            signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
+            //signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
         }
         lastTime = now;
     }
@@ -290,12 +308,18 @@ function play() {
 }
 
 function end() {
+    muteMusic();
     g.pause();
     totalScore.content = "total score: " + score;
     gameScene.visible = false;
     gameOverScene.visible = true;
     window.addEventListener('click', function () {
         window.location.reload();
+    });
+    window.addEventListener('keyup', function (e) {
+        if (e.keyCode === 13) {
+            window.location.reload();
+        }
     });
 }
 
