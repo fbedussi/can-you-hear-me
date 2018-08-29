@@ -104,6 +104,12 @@ function createSignalBar() {
     gameScene.addChild(signalBar);
 }
 
+blurred = false
+    window.onblur = function () {
+        sequence1.gain.gain.value = 0
+        sequence2.gain.gain.value = 0
+        blurred = true
+    }
 
 function setup() {
     var roadWidth = 0.6;
@@ -214,22 +220,9 @@ function setup() {
     g.state = play;
 
 
-    window_focus = false;
-    window.onblur = function () { 
-        window_focus = false; 
-        muteMusic();
-    }
-    window.onfocus = function () { 
-        window_focus = true; 
-        muteMusic();
-        playAt(150)
-    }
+    
 
-    if (window_focus) {
-        playAt(150)
-    } else {
-        muteMusic();
-    }
+    playAt(150);
 }
 
 function restartSignal(signal) {
@@ -241,6 +234,13 @@ function restartSignal(signal) {
 }
 
 function play() {
+    if (blurred == true) {
+        if (isMuted == false) {
+            sequence1.gain.gain.value = 0.1
+            sequence2.gain.gain.value = 0.05
+        }
+    }
+
     g.move(player);
     g.contain(player, {
         x: 18, y: 0,
@@ -266,6 +266,7 @@ function play() {
 
     if (playerHit) {
         player.alpha = 0.5;
+        dashSound();
         healthBar.inner.width -= carHitPenalty;
     } else {
         player.alpha = 1;
@@ -289,6 +290,7 @@ function play() {
             signalHit = true;
             signalBar.inner.width = Math.min(signalBar.maxWidth, signalBar.width + signalBar.width / signalBar.numberOfSegments);
             score += 10;
+            coinSound();
             scoreDisplay.content = "score: " + score;
             restartSignal(signal);
         }
@@ -297,7 +299,7 @@ function play() {
     var now = Date.now();
     if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
-            //signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
+            signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
         }
         lastTime = now;
     }
