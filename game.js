@@ -104,6 +104,113 @@ function createSignalBar() {
     gameScene.addChild(signalBar);
 }
 
+function explosionSound() {
+    g.soundEffect(
+        30,          //frequency
+        0,           //attack
+        0.5,           //decay
+        "square",  //waveform
+        0.7,           //volume
+        0,           //pan
+        0,           //wait before playing
+        1,           //pitch bend amount
+        false,       //reverse
+        1,           //random pitch range
+        150,          //dissonance
+        undefined,   //echo: [delay, feedback, filter]
+        undefined    //reverb: [duration, decay, reverse?]
+    );
+}
+
+function jumpSound() {
+    g.soundEffect(
+      100,       //frequency
+      0.05,         //attack
+      0.2,          //decay
+      "sawtooth",       //waveform
+      0.7,            //volume
+      0.8,          //pan
+      0,            //wait before playing
+      100,          //pitch bend amount
+      true,         //reverse
+      10,          //random pitch range
+      100,            //dissonance
+      undefined,    //echo: [delay, feedback, filter]
+      undefined     //reverb: [duration, decay, reverse?]
+    );
+  }
+//The bonus points sound
+function bonusSound() {
+    //D
+    g.soundEffect(587.33, 0, 0.2, "square", 1, 0, 0);
+    //A
+    g.soundEffect(880, 0, 0.2, "square", 1, 0, 0.1);
+    //High D
+    g.soundEffect(1174.66, 0, 0.3, "square", 1, 0, 0.2);
+}
+
+function melody() {
+    var vol = 0.5;
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 0);
+    //re
+    g.soundEffect(293.665, 0, 0.2, "square", vol, 0, 0.2);
+    //do
+    g.soundEffect(262.63, 0, 0.2, "square", vol, 0, 0.4);
+    //re
+    g.soundEffect(293.665, 0, 0.2, "square", vol, 0, 0.6);
+    
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 0.8);
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 1);
+    //mi
+    g.soundEffect(329.63, 0, 0.4, "square", vol, 0, 1.2);
+    
+    //re
+    g.soundEffect(293.665, 0, 0.2, "square", vol, 0, 1.6);
+    //re
+    g.soundEffect(293.665, 0, 0.2, "square", vol, 0, 1.8);
+    //re
+    g.soundEffect(293.665, 0, 0.4, "square", vol, 0, 2);
+    
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 2.4);
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 2.6);
+    //mi
+    g.soundEffect(329.63, 0, 0.4, "square", vol, 0, 2.8);
+
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 3.2);
+    //re
+    g.soundEffect(293.665, 0, 0.4, "square", vol, 0, 3.4);
+    //do
+    g.soundEffect(262.63, 0, 0.2, "square", vol, 0, 3.8);
+    //re
+    g.soundEffect(293.665, 0, 0.4, "square", vol, 0, 4);
+    
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 4.4);
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 4.6);
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 4.8);
+    //do
+    g.soundEffect(262.63, 0, 0.2, "square", vol, 0, 5);
+    
+    //re
+    g.soundEffect(293.665, 0, 0.4, "square", vol, 0, 5.2);
+    //re
+    g.soundEffect(293.665, 0, 0.4, "square", vol, 0, 5.6);
+    //mi
+    g.soundEffect(329.63, 0, 0.2, "square", vol, 0, 6);
+    //re
+    g.soundEffect(293.665, 0, 0.4, "square", vol, 0, 6.2);
+    
+    //do
+    g.soundEffect(262.63, 0, 0.8, "square", vol, 0, 6.6);
+}
 
 function setup() {
     var roadWidth = 0.6;
@@ -213,23 +320,26 @@ function setup() {
 
     g.state = play;
 
+    melody();
+    setInterval(melody, 7800);
 
-    window_focus = false;
-    window.onblur = function () { 
-        window_focus = false; 
-        muteMusic();
-    }
-    window.onfocus = function () { 
-        window_focus = true; 
-        muteMusic();
-        playAt(150)
-    }
 
-    if (window_focus) {
-        playAt(150)
-    } else {
-        muteMusic();
-    }
+    // window_focus = false;
+    // window.onblur = function () { 
+    //     window_focus = false; 
+    //     muteMusic();
+    // }
+    // window.onfocus = function () { 
+    //     window_focus = true; 
+    //     muteMusic();
+    //     playAt(150)
+    // }
+
+    // if (window_focus) {
+    //     playAt(150)
+    // } else {
+    //     muteMusic();
+    // }
 }
 
 function restartSignal(signal) {
@@ -241,6 +351,7 @@ function restartSignal(signal) {
 }
 
 function play() {
+
     g.move(player);
     g.contain(player, {
         x: 18, y: 0,
@@ -267,6 +378,7 @@ function play() {
     if (playerHit) {
         player.alpha = 0.5;
         healthBar.inner.width -= carHitPenalty;
+        jumpSound();
     } else {
         player.alpha = 1;
     }
@@ -290,6 +402,7 @@ function play() {
             signalBar.inner.width = Math.min(signalBar.maxWidth, signalBar.width + signalBar.width / signalBar.numberOfSegments);
             score += 10;
             scoreDisplay.content = "score: " + score;
+            bonusSound();
             restartSignal(signal);
         }
     });
