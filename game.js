@@ -306,7 +306,7 @@ function play() {
     var now = Date.now();
     if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
-            //signalIndicator.setSignalStrength(-1);
+            signalIndicator.setSignalStrength(-1);
         }
         lastTime = now;
     }
