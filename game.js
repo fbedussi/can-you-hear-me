@@ -261,14 +261,11 @@ function play() {
     var playerHit = false;
 
     cars.forEach(function (car) {
-        g.move(car);
+        var carHitsEdges = (car.originalY < 0 && car.y > canvasH) || car.y < -car.height;
 
-        var carHitsEdges = (car.originalY < canvasH && car.y > canvasH) || car.y < -car.height;
-
-        if (carHitsEdges) {
-            car.y = car.originalY;
-        }
-
+        car.visible = !carHitsEdges;
+        car.y = carHitsEdges ? car.originalY : car.y += car.vy;
+        
         if (g.hitTestRectangle(player, car)) {
             playerHit = true;
         }
@@ -309,7 +306,7 @@ function play() {
     var now = Date.now();
     if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
-            signalIndicator.setSignalStrength(-1);
+            //signalIndicator.setSignalStrength(-1);
         }
         lastTime = now;
     }
@@ -334,7 +331,6 @@ function end() {
         }
     });
 }
-
 g.start();
 g.scaleToWindow();
 window.addEventListener("resize", () => g.scaleToWindow);
