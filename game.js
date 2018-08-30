@@ -17,7 +17,7 @@ var player,
             'images/bob.png',
             'images/car.png',
             'images/car2.png',
-            'images/hearth-icon.png',
+            'images/hearth.png',
         ]
     ),
     canvasW = g.canvas.width,
@@ -76,7 +76,7 @@ function createCar(roadWidth, carNumber) {
 }
 
 function createHealthBar() {
-    var icon = g.sprite('images/hearth-icon.png');
+    var icon = g.sprite('images/hearth.png');
     var outerBar = g.rectangle(40, 15, "rgba(0,0,0,0.5)", "", 0, 20, 0);
     var innerBar = g.rectangle(40, 15, "seaGreen", "", 0, 20, 0);
 
@@ -241,7 +241,6 @@ function restartSignal(signal) {
     signal.y = g.randomInt(0, canvasH);
     signal.vx = signal.speed * getDirection();
     signal.vy = signal.speed * getDirection();
-    g.fadeIn(signal, 360);
 }
 
 function play() {
