@@ -9,10 +9,7 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
     sequence1,
     sequence2,
     coinTake,
-    die,
-    jjump,
     s_dash,
-    change_p,
     // create an array of "note strings" that can be passed to a sequence
     cc = [
         "E5 e",
@@ -101,24 +98,12 @@ coinTake.loop = false
 coinTake.tempo = 300
 coinTake.staccato = 0.55;
 
-die = new TinyMusic.Sequence(ac, 100, dd);
-die.loop = false
-die.tempo = 300
-die.staccato = 0.55;
 
-jjump = new TinyMusic.Sequence(ac, 100, jj);
-jjump.loop = false
-jjump.tempo = 300
-jjump.smoothing = 1;
 
 s_dash = new TinyMusic.Sequence(ac, 100, ee);
 s_dash.loop = false
 s_dash.tempo = 300
 s_dash.smoothing = 1;
-
-change_p = new TinyMusic.Sequence(ac, 100, cp);
-change_p.loop = false
-change_p.tempo = 300
 
 // set staccato values for maximum coolness
 sequence1.staccato = 0.55;
@@ -128,10 +113,7 @@ sequence2.staccato = 0.55;
 sequence1.gain.gain.value = 0.1;
 sequence2.gain.gain.value = 0.05
 coinTake.gain.gain.value = 0.1;
-die.gain.gain.value = 0.2;
-jjump.gain.gain.value = 0.1;
 s_dash.gain.gain.value = 0.1;
-change_p.gain.gain.value = 0.1;
 
 /*
   Audio utilities
@@ -140,20 +122,8 @@ function coinSound() {
     coinTake.play(ac.currentTime)
 }
 
-function dieSound() {
-    die.play(ac.currentTime)
-}
-
-function jumpSound() {
-    jjump.play(ac.currentTime)
-}
-
 function dashSound() {
     s_dash.play(ac.currentTime)
-}
-
-function soundChange() {
-    change_p.play(ac.currentTime)
 }
 
 //call this to play the sequences at the desired speed
@@ -173,21 +143,13 @@ function muteMusic() {
         sequence1.gain.gain.value = 0.1;
         sequence2.gain.gain.value = 0.05
         coinTake.gain.gain.value = 0.1;
-        die.gain.gain.value = 0.2;
-        jjump.gain.gain.value = 0.1;
         s_dash.gain.gain.value = 0.1;
-        change_p.gain.gain.value = 0.1;
         isMuted = false
     } else {
         sequence1.gain.gain.value = 0
         sequence2.gain.gain.value = 0
         coinTake.gain.gain.value = 0
-        die.gain.gain.value = 0
-        jjump.gain.gain.value = 0
         s_dash.gain.gain.value = 0
-        change_p.gain.gain.value = 0
         isMuted = true
     }
-
-
 }
