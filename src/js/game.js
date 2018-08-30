@@ -91,15 +91,15 @@ function createHealthBar() {
 }
 
 function createSignalIndicator() {
-    var barColor =  'brown';
-    var antennaArm1 = g.rectangle(2.5, 7, barColor, "", 0, 3, 2);
-    var antennaLeg = g.rectangle(2.5, 15, barColor, "", 0, 6, 0);
-    var antennaArm2 = g.rectangle(2.5, 7, barColor, "", 0, 9, 2);
-    var bar1 = g.rectangle(5, 5, barColor, "", 0, 15, 10);
-    var bar2 = g.rectangle(5, 7.5, barColor, "", 0, 22.5, 7.5);
-    var bar3 = g.rectangle(5, 10, barColor, "", 0, 30, 5);
-    var bar4 = g.rectangle(5, 12.5, barColor, "", 0, 37.5, 2.5);
-    var maxSignalStrength = 4;
+    var barColor = 'brown',
+        antennaArm1 = g.rectangle(2.5, 7, barColor, "", 0, 3, 2),
+        antennaLeg = g.rectangle(2.5, 15, barColor, "", 0, 6, 0),
+        antennaArm2 = g.rectangle(2.5, 7, barColor, "", 0, 9, 2),
+        bar1 = g.rectangle(5, 5, barColor, "", 0, 15, 10),
+        bar2 = g.rectangle(5, 7.5, barColor, "", 0, 22.5, 7.5),
+        bar3 = g.rectangle(5, 10, barColor, "", 0, 30, 5),
+        bar4 = g.rectangle(5, 12.5, barColor, "", 0, 37.5, 2.5),
+        maxSignalStrength = 4;
 
     antennaArm1.rotation = 40;
     antennaArm2.rotation = -40;
@@ -111,7 +111,7 @@ function createSignalIndicator() {
     signalIndicator.bar3 = bar3;
     signalIndicator.bar4 = bar4;
     signalIndicator.strength = maxSignalStrength;
-    signalIndicator.setSignalStrength = function(delta) {
+    signalIndicator.setSignalStrength = function (delta) {
         signalIndicator.strength = Math.min(maxSignalStrength, Math.max(0, signalIndicator.strength + delta));
         for (let i = 1; i <= maxSignalStrength; i++) {
             signalIndicator[`bar${i}`].fillStyle = i <= signalIndicator.strength ? barColor : 'transparent';
@@ -121,11 +121,11 @@ function createSignalIndicator() {
 }
 
 blurred = false
-    window.onblur = function () {
-        sequence1.gain.gain.value = 0
-        sequence2.gain.gain.value = 0
-        blurred = true
-    }
+window.onblur = function () {
+    sequence1.gain.gain.value = 0
+    sequence2.gain.gain.value = 0
+    blurred = true
+}
 
 function setup() {
     var roadWidth = 0.6;
@@ -139,6 +139,7 @@ function setup() {
     gameScene = g.group();
 
     var background = g.sprite('images/background.png');
+    background.x = 9;
     gameScene.addChild(background);
     for (let i = 0; i < numberOfCars; i++) {
         createCar(roadWidth, i);
@@ -265,7 +266,7 @@ function play() {
 
         car.visible = !carHitsEdges;
         car.y = carHitsEdges ? car.originalY : car.y += car.vy;
-        
+
         if (g.hitTestRectangle(player, car)) {
             playerHit = true;
         }
