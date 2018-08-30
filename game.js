@@ -8,7 +8,7 @@ var player,
     totalScore,
     cars,
     healthBar,
-    signalBar,
+    signalIndicator,
     g = ga(
         300, 300, setup,
         [
@@ -89,19 +89,34 @@ function createHealthBar() {
     gameScene.addChild(healthBar);
 }
 
-function createSignalBar() {
-    var outerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "black"),
-        innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "red"),
-        text = g.text("signal", "10px arial", "black", 0, 0);
+function createSignalIndicator() {
+    var barColor =  'brown';
+    var antennaArm1 = g.rectangle(2.5, 7, barColor, "", 0, 3, 2);
+    var antennaLeg = g.rectangle(2.5, 15, barColor, "", 0, 6, 0);
+    var antennaArm2 = g.rectangle(2.5, 7, barColor, "", 0, 9, 2);
+    var bar1 = g.rectangle(5, 5, barColor, "", 0, 15, 10);
+    var bar2 = g.rectangle(5, 7.5, barColor, "", 0, 22.5, 7.5);
+    var bar3 = g.rectangle(5, 10, barColor, "", 0, 30, 5);
+    var bar4 = g.rectangle(5, 12.5, barColor, "", 0, 37.5, 2.5);
+    var maxSignalStrength = 4;
 
-    signalBar = g.group(outerBar, innerBar, text);
-
-    signalBar.inner = innerBar;
-    signalBar.maxWidth = signalBar.width;
-    signalBar.x = canvasW * 0.02;
-    signalBar.y = canvasH * 0.05;
-    signalBar.numberOfSegments = 5;
-    gameScene.addChild(signalBar);
+    antennaArm1.rotation = 40;
+    antennaArm2.rotation = -40;
+    signalIndicator = g.group(antennaLeg, antennaArm1, antennaArm2, bar1, bar2, bar3, bar4);
+    signalIndicator.x = 5;
+    signalIndicator.y = 20;
+    signalIndicator.bar1 = bar1;
+    signalIndicator.bar2 = bar2;
+    signalIndicator.bar3 = bar3;
+    signalIndicator.bar4 = bar4;
+    signalIndicator.strength = maxSignalStrength;
+    signalIndicator.setSignalStrength = function(delta) {
+        signalIndicator.strength = Math.min(maxSignalStrength, Math.max(0, signalIndicator.strength + delta));
+        for (let i = 1; i <= maxSignalStrength; i++) {
+            signalIndicator[`bar${i}`].fillStyle = i <= signalIndicator.strength ? barColor : 'transparent';
+        }
+    }
+    gameScene.addChild(signalIndicator);
 }
 
 blurred = false
@@ -122,8 +137,6 @@ function setup() {
 
     gameScene = g.group();
 
-    // road = g.rectangle(canvasW * roadWidth, canvasH, "black", "", 0, canvasW * ((1 - roadWidth) / 2), 0);
-    // gameScene.addChild(road);
     var background = g.sprite('images/background.png');
     gameScene.addChild(background);
     for (let i = 0; i < numberOfCars; i++) {
@@ -193,7 +206,7 @@ function setup() {
         }
     };
 
-    scoreDisplay = g.text("score:" + score, "10px impact", "black", canvasW * 0.01, canvasW * 0.005);
+    scoreDisplay = g.text("score:" + score, "10px impact", "black", 5, 5);
     gameScene.add(scoreDisplay, player);
 
     var signalCreationInterval = setInterval(function () {
@@ -207,7 +220,7 @@ function setup() {
     }, signalIterval);
 
     createHealthBar();
-    createSignalBar();
+    createSignalIndicator();
 
     message = g.text("Game Over!", "30px monospace", "black", 85, g.canvas.height / 2 - 64);
     totalScore = g.text("", "15px monospace", "black", 110, g.canvas.height / 2);
@@ -218,9 +231,6 @@ function setup() {
     gameOverScene.visible = false;
 
     g.state = play;
-
-
-    
 
     playAt(150);
 }
@@ -288,7 +298,7 @@ function play() {
 
         if (g.hitTestCircleRectangle(signal, player)) {
             signalHit = true;
-            signalBar.inner.width = Math.min(signalBar.maxWidth, signalBar.width + signalBar.width / signalBar.numberOfSegments);
+            signalIndicator.setSignalStrength(+1);
             score += 10;
             coinSound();
             scoreDisplay.content = "score: " + score;
@@ -299,12 +309,12 @@ function play() {
     var now = Date.now();
     if ((now - lastTime) > fieldDecayTime) {
         if (!signalHit) {
-            signalBar.inner.width = Math.max(0, signalBar.inner.width - signalBar.width / signalBar.numberOfSegments);
+            signalIndicator.setSignalStrength(-1);
         }
         lastTime = now;
     }
 
-    if (healthBar.inner.width < 0 || signalBar.inner.width <= 0) {
+    if (healthBar.inner.width < 0 || !signalIndicator.strength) {
         g.state = end;
     }
 }
