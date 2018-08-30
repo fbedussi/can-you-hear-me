@@ -17,6 +17,7 @@ var player,
             'images/bob.png',
             'images/car.png',
             'images/car2.png',
+            'images/hearth-icon.png',
         ]
     ),
     canvasW = g.canvas.width,
@@ -75,16 +76,16 @@ function createCar(roadWidth, carNumber) {
 }
 
 function createHealthBar() {
-    var outerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "black"),
-        innerBar = g.rectangle(canvasW * 0.15, canvasH * 0.05, "yellowGreen"),
-        text = g.text("energy", "10px arial", "black", 0, 0);
+    var icon = g.sprite('images/hearth-icon.png');
+    var outerBar = g.rectangle(40, 15, "rgba(0,0,0,0.5)", "", 0, 20, 0);
+    var innerBar = g.rectangle(40, 15, "seaGreen", "", 0, 20, 0);
 
-    healthBar = g.group(outerBar, innerBar, text);
+    healthBar = g.group(icon, outerBar, innerBar);
 
     healthBar.inner = innerBar;
 
-    healthBar.x = canvasW * 0.825;
-    healthBar.y = canvasH * 0.05;
+    healthBar.x = 60;
+    healthBar.y = 5;
 
     gameScene.addChild(healthBar);
 }
@@ -104,7 +105,7 @@ function createSignalIndicator() {
     antennaArm2.rotation = -40;
     signalIndicator = g.group(antennaLeg, antennaArm1, antennaArm2, bar1, bar2, bar3, bar4);
     signalIndicator.x = 5;
-    signalIndicator.y = 20;
+    signalIndicator.y = 5;
     signalIndicator.bar1 = bar1;
     signalIndicator.bar2 = bar2;
     signalIndicator.bar3 = bar3;
@@ -206,8 +207,8 @@ function setup() {
         }
     };
 
-    scoreDisplay = g.text("score:" + score, "10px impact", "black", 5, 5);
-    gameScene.add(scoreDisplay, player);
+    scoreDisplay = g.text("score:" + score, "10px impact", "black", 245, 5);
+    gameScene.add(player, scoreDisplay);
 
     var signalCreationInterval = setInterval(function () {
         if (!lastTime) {
@@ -222,9 +223,9 @@ function setup() {
     createHealthBar();
     createSignalIndicator();
 
-    message = g.text("Game Over!", "30px monospace", "black", 85, g.canvas.height / 2 - 64);
-    totalScore = g.text("", "15px monospace", "black", 110, g.canvas.height / 2);
-    var replay = g.text("click or enter to replay", "15px monospace", "black", 50, g.canvas.height / 2 + 40);
+    message = g.text("Game Over!", "30px impact", "black", 85, g.canvas.height / 2 - 64);
+    totalScore = g.text("", "15px impact", "black", 110, g.canvas.height / 2);
+    var replay = g.text("click or enter to replay", "15px impact", "black", 85, g.canvas.height / 2 + 40);
 
     gameOverScene = g.group(message, totalScore, replay);
 
