@@ -1278,51 +1278,7 @@ GA.create = function(width, height, setup, assetsToLoad, load) {
     return o;
   };
 
-  //### line
-  //`line` creates and returns a line with a start and end points.
-  //arguments: lineColor, lineWidth, startX, startY, endX, endY.
-  ga.line = function(strokeStyle, lineWidth, ax, ay, bx, by) {
-    var o = {};
-
-    //Add basic properties to the sprite.
-    makeDisplayObject(o);
-
-    //Set the defaults.
-    if (!ax && ax !== 0) ax = 0;
-    if (!ay && ay !== 0) ay = 0;
-    if (!bx && bx !== 0) bx = 32;
-    if (!by && by !== 0) by = 32;
-    o.ax = ax;
-    o.ay = ay;
-    o.bx = bx;
-    o.by = by;
-    o.strokeStyle = strokeStyle || "red";
-    o.lineWidth = lineWidth || 1;
-
-    //The `lineJoin` style.
-    //Options are "round", "mitre" and "bevel".
-    o.lineJoin = "round";
-
-    //Add the sprite to the stage.
-    ga.stage.addChild(o);
-
-    //Add a `render` method that explains to the canvas how to draw
-    //a line.
-    o.render = function(ctx) {
-      ctx.strokeStyle = o.strokeStyle;
-      ctx.lineWidth = o.lineWidth;
-      ctx.lineJoin = o.lineJoin;
-      ctx.beginPath();
-      ctx.moveTo(o.ax, o.ay);
-      ctx.lineTo(o.bx, o.by);
-      //ctx.closePath();
-      if (o.strokeStyle !== "none") ctx.stroke();
-      if (o.fillStyle !== "none") ctx.fill();
-    };
-
-    //Return the line.
-    return o;
-  };
+  
 
   //### text
   //`text` creates and returns a single line of dynamic text.
@@ -1622,24 +1578,7 @@ GA.create = function(width, height, setup, assetsToLoad, load) {
     return o;
   };
 
-  //### button
-  //`button` creates and returns a button with `up`, `over` and `down`
-  //states. You can also assign custom `press` and `release` methods.
-  //arguments: sourceString (The same as an ordinary sprite.)
-  ga.button = function(source) {
-
-    //First, make an ordinary sprite.
-    var o = ga.sprite(source);
-
-    //Assign this as a "button" subtype.
-    o.subtype = "button";
-
-    //Make it interactive (see ahead).
-    makeInteractive(o);
-
-    //Return it.
-    return o;
-  };
+ 
 
   //### makeInteractive
   //The `makeInteractive` function lets you assign `press`, `release`, `over`, `tap`
