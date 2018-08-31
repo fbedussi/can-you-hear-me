@@ -12,7 +12,6 @@ var player,
     g = ga(
         300, 300, setup,
         [
-            'images/background.png',
             'images/bob.png',
             'images/car.png',
             'images/car2.png',
@@ -189,8 +188,23 @@ function setup() {
 
     gameScene = g.group();
 
-    var background = g.sprite('images/background.png');
-    
+    var background = g.group();
+
+    background.add(
+        g.rectangle(canvasW - 20, canvasH, "#484848", "", 0, 2, 0),
+        g.rectangle(canvasW - 24, canvasH, "#a7a7a7", "", 0, 4, 0),
+        g.rectangle(canvasW - 32, canvasH, "#d0cbc8", "", 0, 8, 0),
+        g.rectangle(canvasW - 34, canvasH, "#969696", "", 0, 9, 0),
+        g.rectangle(canvasW - 36, canvasH, "#584e47", "", 0, 10, 0),
+        g.rectangle(canvasW - 38, canvasH, "#63564e", "", 0, 11, 0),
+        g.rectangle(canvasW - 44, canvasH, "#7e6d61", "", 0, 14, 0),
+        g.rectangle(canvasW - 56, canvasH, "#917c6f", "", 0, 20, 0),
+        g.rectangle(canvasW - 80, canvasH, "#7e6d61", "", 0, 32, 0),
+        g.rectangle(canvasW - 88, canvasH, "#63554c", "", 0, 36, 0),
+        g.rectangle(canvasW - 92, canvasH, "#645a54", "", 0, 38, 0),
+        g.rectangle(canvasW - 94, canvasH, "#707070", "", 0, 39, 0),
+        g.rectangle(canvasW - 96, canvasH, "#414141", "", 0, 40, 0),
+    );
     background.x = 9;
     gameScene.addChild(background);
     for (let i = 0; i < numberOfCars; i++) {
