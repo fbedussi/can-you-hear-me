@@ -13,11 +13,9 @@ var player,
         300, 300, setup,
         [
             'images/background.png',
-            'images/signal.png',
             'images/bob.png',
             'images/car.png',
             'images/car2.png',
-            'images/hearth.png',
         ]
     ),
     canvasW = g.canvas.width,
@@ -35,9 +33,45 @@ function getDirection() {
     return g.randomFloat(-1, 1);
 }
 
-function makeSignal(speed) {
-    var signal = g.sprite('images/signal.png');
+function drawSprite(pixels, dimension = 1) {
+    var sprite = g.group();
+    var x = 0;
+    var y = 0;
+    pixels.forEach((line) => {
+        line.forEach((pixelFillStyle) => {
+            let pixelSprite = g.rectangle(dimension, dimension, pixelFillStyle, "", 0, x, y);
+            sprite.addChild(pixelSprite);
+            x += dimension;
+        })
+        y += dimension;
+        x = 0;
+    });
+    return sprite;
+}
 
+function makeSignal(speed) {
+    var _ ="transparent";
+    var i = "LightSkyBlue";
+    var c = "Turquoise";
+    var x = "SteelBlue";
+    var signal = drawSprite([
+        [_, _, _, _, i, _, _, _, _, _, _, i, _, _, _, _],
+        [_, _, i, i, _, _, _, _, _, _, _, _, i, i, _, _],
+        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i, _],
+        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i, _],
+        [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
+        [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],        
+        [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
+        [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
+        [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
+        [i, _, c, _, _, x, _, _, _, _, x, _, c, c, _, i],
+        [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],
+        [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
+        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i, _],
+        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i, _],
+        [_, _, i, i, _, _, _, _, _, _, _, _, i, i, _, _],
+        [_, _, _, _, i, _, _, _, _, _, _, i, _, _, _, _],
+    ]);   
     signal.speed = speed;
     signal.x = g.randomInt(0, g.canvas.width);
     signal.y = g.randomInt(0, g.canvas.height);
@@ -76,9 +110,24 @@ function createCar(roadWidth, carNumber) {
 }
 
 function createHealthBar() {
-    var icon = g.sprite('images/hearth.png');
-    var outerBar = g.rectangle(40, 15, "rgba(0,0,0,0.5)", "", 0, 20, 0);
-    var innerBar = g.rectangle(40, 15, "seaGreen", "", 0, 20, 0);
+    var _ = "transparent";
+    var B = "black";
+    var r = "red";
+    var o = "white";
+    var icon = drawSprite([
+        [_, B, B, B, B, _, B, B, B, B, _],
+        [B, r, r, r, r, B, r, r, r, r, B],
+        [B, r, r, r, r, r, r, r, o, r, B],
+        [B, r, r, r, r, r, r, r, o, r, B],
+        [_, B, r, r, r, r, r, o, r, B, _],
+        [_, _, B, r, r, r, r, r, B, _, _],
+        [_, _, _, B, r, r, r, B, _, _, _],
+        [_, _, _, _, B, r, B, _, _, _, _],
+        [_, _, _, _, _, B, _, _, _, _, _],
+    ],1,);
+    icon.y = 3;
+    var outerBar = g.rectangle(40, 15, "rgba(0,0,0,0.5)", "", 0, 15, 0);
+    var innerBar = g.rectangle(40, 15, "seaGreen", "", 0, 15, 0);
 
     healthBar = g.group(icon, outerBar, innerBar);
 
@@ -120,6 +169,8 @@ function createSignalIndicator() {
     gameScene.addChild(signalIndicator);
 }
 
+
+
 blurred = false
 window.onblur = function () {
     sequence1.gain.gain.value = 0
@@ -139,6 +190,7 @@ function setup() {
     gameScene = g.group();
 
     var background = g.sprite('images/background.png');
+    
     background.x = 9;
     gameScene.addChild(background);
     for (let i = 0; i < numberOfCars; i++) {
