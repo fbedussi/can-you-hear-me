@@ -1,3 +1,4 @@
+//Global variables;
 var player,
     signals,
     message,
@@ -19,23 +20,27 @@ var player,
     ),
     canvasW = g.canvas.width,
     canvasH = g.canvas.height,
+    lastTime,
+    blurred = false,
+    
+    //Configuration
     signalSpeed = 2,
     signalIterval = 2000,
-    fieldDecayTime = 1000,
+    fieldDecayTime = 2000,
     numberOfSignals = 4,
     numberOfCars = 4,
-    carHitPenalty = 0.1,
-    lastTime;
-;
+    carHitPenalty = 0.1;
+
 
 function getDirection() {
     return g.randomFloat(-1, 1);
 }
 
 function drawSprite(pixels, dimension = 1) {
-    var sprite = g.group();
-    var x = 0;
-    var y = 0;
+    var sprite = g.group(),
+        x = 0,
+        y = 0;
+    
     pixels.forEach((line) => {
         line.forEach((pixelFillStyle) => {
             let pixelSprite = g.rectangle(dimension, dimension, pixelFillStyle, "", 0, x, y);
@@ -49,28 +54,28 @@ function drawSprite(pixels, dimension = 1) {
 }
 
 function makeSignal(speed) {
-    var _ ="transparent";
+    var _ = "transparent";
     var i = "LightSkyBlue";
     var c = "Turquoise";
     var x = "SteelBlue";
     var signal = drawSprite([
-        [_, _, _, _, i, _, _, _, _, _, _, i, _, _, _, _],
-        [_, _, i, i, _, _, _, _, _, _, _, _, i, i, _, _],
-        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i, _],
-        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i, _],
+        [_, _, _, _, i, _, _, _, _, _, _, i],
+        [_, _, i, i, _, _, _, _, _, _, _, _, i, i],
+        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i],
+        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i],
         [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
-        [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],        
+        [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],
         [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
         [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
         [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
         [i, _, c, _, _, x, _, _, _, _, x, _, c, c, _, i],
         [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],
         [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
-        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i, _],
-        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i, _],
-        [_, _, i, i, _, _, _, _, _, _, _, _, i, i, _, _],
-        [_, _, _, _, i, _, _, _, _, _, _, i, _, _, _, _],
-    ]);   
+        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i],
+        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i],
+        [_, _, i, i, _, _, _, _, _, _, _, _, i, i],
+        [_, _, _, _, i, _, _, _, _, _, _, i],
+    ]);
     signal.speed = speed;
     signal.x = g.randomInt(0, g.canvas.width);
     signal.y = g.randomInt(0, g.canvas.height);
@@ -78,11 +83,9 @@ function makeSignal(speed) {
     signal.vx = signal.speed * getDirection();
     setInterval(() => {
         if (signal.scaleX === 1) {
-            signal.scaleX = 0.5;
-            signal.scaleY = 0.5;
+            signal.scaleX = signal.scaleY = 0.5;
         } else {
-            signal.scaleX = 1;
-            signal.scaleY = 1;
+            signal.scaleX = signal.scaleY = 1;
         }
     }, 100)
 
@@ -114,16 +117,16 @@ function createHealthBar() {
     var r = "red";
     var o = "white";
     var icon = drawSprite([
-        [_, B, B, B, B, _, B, B, B, B, _],
+        [_, B, B, B, B, _, B, B, B, B],
         [B, r, r, r, r, B, r, r, r, r, B],
         [B, r, r, r, r, r, r, r, o, r, B],
         [B, r, r, r, r, r, r, r, o, r, B],
-        [_, B, r, r, r, r, r, o, r, B, _],
-        [_, _, B, r, r, r, r, r, B, _, _],
-        [_, _, _, B, r, r, r, B, _, _, _],
-        [_, _, _, _, B, r, B, _, _, _, _],
-        [_, _, _, _, _, B, _, _, _, _, _],
-    ],1,);
+        [_, B, r, r, r, r, r, o, r, B],
+        [_, _, B, r, r, r, r, r, B],
+        [_, _, _, B, r, r, r, B],
+        [_, _, _, _, B, r, B],
+        [_, _, _, _, _, B],
+    ], 1);
     icon.y = 3;
     var outerBar = g.rectangle(40, 15, "rgba(0,0,0,0.5)", "", 0, 15, 0);
     var innerBar = g.rectangle(40, 15, "seaGreen", "", 0, 15, 0);
@@ -140,18 +143,24 @@ function createHealthBar() {
 
 function createSignalIndicator() {
     var barColor = 'brown',
-        antennaArm1 = g.rectangle(2.5, 7, barColor, "", 0, 3, 2),
-        antennaLeg = g.rectangle(2.5, 15, barColor, "", 0, 6, 0),
-        antennaArm2 = g.rectangle(2.5, 7, barColor, "", 0, 9, 2),
-        bar1 = g.rectangle(5, 5, barColor, "", 0, 15, 10),
-        bar2 = g.rectangle(5, 7.5, barColor, "", 0, 22.5, 7.5),
-        bar3 = g.rectangle(5, 10, barColor, "", 0, 30, 5),
-        bar4 = g.rectangle(5, 12.5, barColor, "", 0, 37.5, 2.5),
+        bar1 = g.rectangle(5, 5, barColor, "", 0, 17, 10),
+        bar2 = g.rectangle(5, 7.5, barColor, "", 0, 24.5, 7.5),
+        bar3 = g.rectangle(5, 10, barColor, "", 0, 32, 5),
+        bar4 = g.rectangle(5, 12.5, barColor, "", 0, 39.5, 2.5),
         maxSignalStrength = 4;
-
-    antennaArm1.rotation = 40;
-    antennaArm2.rotation = -40;
-    signalIndicator = g.group(antennaLeg, antennaArm1, antennaArm2, bar1, bar2, bar3, bar4);
+    var X = barColor;
+    var _ = "transparent";
+    var antenna = drawSprite([
+        [X, _, _, X, _, _, X],
+        [_, X, _, X, _, X,],
+        [_, _, X, X, X],
+        [_, _, _, X],
+        [_, _, _, X],
+        [_, _, _, X],
+    ], 1.5);
+    antenna.x = 5;
+    antenna.y = 6;
+    signalIndicator = g.group(antenna, bar1, bar2, bar3, bar4);
     signalIndicator.x = 5;
     signalIndicator.y = 5;
     signalIndicator.bar1 = bar1;
@@ -168,13 +177,35 @@ function createSignalIndicator() {
     gameScene.addChild(signalIndicator);
 }
 
-
-
-blurred = false
-window.onblur = function () {
-    sequence1.gain.gain.value = 0
-    sequence2.gain.gain.value = 0
-    blurred = true
+function createBackground() {
+    var background = g.group();
+    var bgX = 8;
+    [
+        [2, "#484848"],
+        [2, "#a7a7a7"],
+        [1, "#969696"],
+        [1, "#584e47"],
+        [1, "#63564e"],
+        [3, "#7e6d61"],
+        [8, "#917c6f"],
+        [30, "#7e6d61"],
+        [8, "#63554c"],
+        [2, "#645a54"],
+        [1, "#707070"],
+        [1, "#414141"],
+    ].forEach((bgData) => {
+        bgX += bgData[0];
+        background.add(g.rectangle(canvasW - (bgX * 2), canvasH, bgData[1], "", 0, bgX, 0));
+    });
+    for (let i = 0; i < 300; i++) {
+        let gray = g.randomInt(50, 90);
+        background.add(g.rectangle(3, 3, `rgb(${gray}, ${gray}, ${gray})`, "", 0, g.randomInt(71, canvasW - 71), g.randomInt(0, canvasH)));
+    }
+    for (let i = 0; i < 6; i++) {
+        background.add(g.rectangle(4, 30, "white", "", 0, (canvasW - 4)/2, 10 + i * (30 +20)));
+    }
+    
+    gameScene.addChild(background);
 }
 
 function setup() {
@@ -188,30 +219,13 @@ function setup() {
 
     gameScene = g.group();
 
-    var background = g.group();
+    createBackground();
 
-    background.add(
-        g.rectangle(canvasW - 20, canvasH, "#484848", "", 0, 2, 0),
-        g.rectangle(canvasW - 24, canvasH, "#a7a7a7", "", 0, 4, 0),
-        g.rectangle(canvasW - 32, canvasH, "#d0cbc8", "", 0, 8, 0),
-        g.rectangle(canvasW - 34, canvasH, "#969696", "", 0, 9, 0),
-        g.rectangle(canvasW - 36, canvasH, "#584e47", "", 0, 10, 0),
-        g.rectangle(canvasW - 38, canvasH, "#63564e", "", 0, 11, 0),
-        g.rectangle(canvasW - 44, canvasH, "#7e6d61", "", 0, 14, 0),
-        g.rectangle(canvasW - 56, canvasH, "#917c6f", "", 0, 20, 0),
-        g.rectangle(canvasW - 80, canvasH, "#7e6d61", "", 0, 32, 0),
-        g.rectangle(canvasW - 88, canvasH, "#63554c", "", 0, 36, 0),
-        g.rectangle(canvasW - 92, canvasH, "#645a54", "", 0, 38, 0),
-        g.rectangle(canvasW - 94, canvasH, "#707070", "", 0, 39, 0),
-        g.rectangle(canvasW - 96, canvasH, "#414141", "", 0, 40, 0),
-    );
-    background.x = 9;
-    gameScene.addChild(background);
     for (let i = 0; i < numberOfCars; i++) {
         createCar(roadWidth, i);
     }
 
-    var walkingAnimation = g.filmstrip('images/bob.png', 32, 32);
+    var walkingAnimation = g.filmstrip('images/bob.png', 32, 32, 0);
     player = g.sprite(walkingAnimation);
     player.setPosition(0, 100);
     player.states = {
@@ -398,6 +412,13 @@ function end() {
         }
     });
 }
+
+window.onblur = function () {
+    sequence1.gain.gain.value = 0
+    sequence2.gain.gain.value = 0
+    blurred = true
+}
+
 g.start();
 g.scaleToWindow();
 window.addEventListener("resize", () => g.scaleToWindow);

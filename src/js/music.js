@@ -131,7 +131,7 @@ function playAt(speed) {
     sequence1.stop();
     sequence2.stop();
     sequence1.tempo = speed
-    sequence2.tempo = speed
+    sequence2.tempo = speed 
     sequence1.play(ac.currentTime);
     sequence2.play(ac.currentTime);
 }
