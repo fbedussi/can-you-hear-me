@@ -15,7 +15,7 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         "E5 e",
         "E6 q"
     ],
-    jj = [
+    lu = [
         "E4 e",
         "E3 q"
     ],
@@ -38,11 +38,11 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         'D3  q',
         '-   h',
         'D3  q',
-    
+
         'A2  q',
         '-   h',
         'A2  q',
-    
+
         'A1b e',
         'B0 e',
         'E1 e',
@@ -60,7 +60,7 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         'C4  e',
         'A3  e',
         'Bb3 e',
-    
+
         'G3  e',
         'A3  e',
         'Bb3 e',
@@ -68,7 +68,7 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         'G3  e',
         'A3  e',
         'F3  q',
-    
+
         '-   e',
         'D4  s',
         'C4  s',
@@ -78,7 +78,7 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         'Bb3 e',
         'A3  e',
         'Bb3 e',
-    
+
         'G3  e',
         'A3  e',
         'Bb3 e',
@@ -93,12 +93,16 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
     // create 2 new sequences (one for lead, one for harmony)
     sequence1 = new TinyMusic.Sequence(ac, 100, lead);
 sequence2 = new TinyMusic.Sequence(ac, 100, harmony);
+
 coinTake = new TinyMusic.Sequence(ac, 100, cc);
 coinTake.loop = false
 coinTake.tempo = 300
 coinTake.staccato = 0.55;
 
-
+levelUp = new TinyMusic.Sequence(ac, 100, lu);
+levelUp.loop = false
+levelUp.tempo = 300
+levelUp.staccato = 0.55;
 
 s_dash = new TinyMusic.Sequence(ac, 100, ee);
 s_dash.loop = false
@@ -122,6 +126,10 @@ function coinSound() {
     coinTake.play(ac.currentTime)
 }
 
+function levelUpSound() {
+    levelUp.play(ac.currentTime)
+}
+
 function dashSound() {
     s_dash.play(ac.currentTime)
 }
@@ -131,7 +139,7 @@ function playAt(speed) {
     sequence1.stop();
     sequence2.stop();
     sequence1.tempo = speed
-    sequence2.tempo = speed 
+    sequence2.tempo = speed
     sequence1.play(ac.currentTime);
     sequence2.play(ac.currentTime);
 }

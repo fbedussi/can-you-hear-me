@@ -1,13 +1,14 @@
 //Global variables;
 var player,
-    signals,
+    signals = [],
     message,
     gameScene,
     gameOverScene,
-    score,
     scoreDisplay,
+    levelDisplay,
     totalScore,
-    cars,
+    finalLevel,
+    cars = [],
     healthBar,
     signalIndicator,
     g = ga(
@@ -20,16 +21,23 @@ var player,
     ),
     canvasW = g.canvas.width,
     canvasH = g.canvas.height,
+    initialTime = Date.now(),
     lastTime,
     blurred = false,
-    
+    score = 0,
+    level = 1,
+    playerVelocity = 2,
+
+
     //Configuration
-    signalSpeed = 2,
+    levelTime = 15000,
+    signalSpeed = 1,
     signalIterval = 2000,
-    fieldDecayTime = 2000,
-    numberOfSignals = 4,
-    numberOfCars = 4,
-    carHitPenalty = 0.1;
+    fieldDecayTime = 3000,
+    numberOfSignals = 7,
+    numberOfCars = 1,
+    carHitPenalty = 0.08
+    ;
 
 
 function getDirection() {
@@ -40,7 +48,7 @@ function drawSprite(pixels, dimension = 1) {
     var sprite = g.group(),
         x = 0,
         y = 0;
-    
+
     pixels.forEach((line) => {
         line.forEach((pixelFillStyle) => {
             let pixelSprite = g.rectangle(dimension, dimension, pixelFillStyle, "", 0, x, y);
@@ -180,6 +188,9 @@ function createSignalIndicator() {
 function createBackground() {
     var background = g.group();
     var bgX = 8;
+
+    g.backgroundColor = "gray";
+
     [
         [2, "#484848"],
         [2, "#a7a7a7"],
@@ -202,28 +213,42 @@ function createBackground() {
         background.add(g.rectangle(3, 3, `rgb(${gray}, ${gray}, ${gray})`, "", 0, g.randomInt(71, canvasW - 71), g.randomInt(0, canvasH)));
     }
     for (let i = 0; i < 6; i++) {
-        background.add(g.rectangle(4, 30, "white", "", 0, (canvasW - 4)/2, 10 + i * (30 +20)));
+        background.add(g.rectangle(4, 30, "white", "", 0, (canvasW - 4) / 2, 10 + i * (30 + 20)));
     }
-    
+
     gameScene.addChild(background);
 }
 
-function setup() {
-    var roadWidth = 0.6;
-    var playerVelocity = 2;
+function createSignals() {
+    //signals.forEach((signal) => g.signal.remove());
+    g.remove(signals);
     signals = [];
+    var signalCreationInterval = setInterval(function () {
+        if (!lastTime) {
+            lastTime = Date.now();
+        }
+        makeSignal(signalSpeed);
+        if (signals.length >= numberOfSignals) {
+            clearInterval(signalCreationInterval);
+        }
+    }, signalIterval);
+}
+
+function createCars() {
+    var roadWidth = 0.6;
+    g.remove(cars);
     cars = [];
-    score = 0;
+    for (let i = 0; i < numberOfCars; i++) {
+        createCar(roadWidth, i);
+    }
+}
 
-    g.backgroundColor = "gray";
-
+function setup() {
     gameScene = g.group();
 
     createBackground();
 
-    for (let i = 0; i < numberOfCars; i++) {
-        createCar(roadWidth, i);
-    }
+    createCars();
 
     var walkingAnimation = g.filmstrip('images/bob.png', 32, 32, 0);
     player = g.sprite(walkingAnimation);
@@ -288,27 +313,21 @@ function setup() {
         }
     };
 
-    scoreDisplay = g.text("score:" + score, "10px impact", "black", 245, 5);
-    gameScene.add(player, scoreDisplay);
+    scoreDisplay = g.text("score: " + score, "10px impact", "black", 245, 5);
+    levelDisplay = g.text("lavel: " + level, "10px impact", "black", 245, 20);
+    gameScene.add(player, scoreDisplay, levelDisplay);
 
-    var signalCreationInterval = setInterval(function () {
-        if (!lastTime) {
-            lastTime = Date.now();
-        }
-        makeSignal(signalSpeed);
-        if (signals.length >= numberOfSignals) {
-            clearInterval(signalCreationInterval);
-        }
-    }, signalIterval);
+    createSignals();
 
     createHealthBar();
     createSignalIndicator();
 
     message = g.text("Game Over!", "30px impact", "black", 85, g.canvas.height / 2 - 64);
-    totalScore = g.text("", "15px impact", "black", 110, g.canvas.height / 2);
+    totalScore = g.text("", "15px impact", "black", 110, g.canvas.height / 2 - 10);
+    finalLevel = g.text("", "15px impact", "black", 130, g.canvas.height / 2 + 10);
     var replay = g.text("click or enter to replay", "15px impact", "black", 85, g.canvas.height / 2 + 40);
 
-    gameOverScene = g.group(message, totalScore, replay);
+    gameOverScene = g.group(message, totalScore, finalLevel, replay);
 
     gameOverScene.visible = false;
 
@@ -324,6 +343,53 @@ function restartSignal(signal) {
     signal.vy = signal.speed * getDirection();
 }
 
+function increaseLevel() {
+    level++;
+    levelDisplay.content = "level: " + level;
+    signalIterval = 0;
+
+    switch (level) {
+        case 2:
+            numberOfCars++
+            createCars();
+            break;
+        case 3:
+            numberOfSignals = 6;
+            createSignals();
+            break;
+        case 4:
+            signalSpeed = 2;
+            createSignals();
+            break;
+        case 5:
+            numberOfCars++
+            createCars();
+            break;
+        case 6:
+            numberOfCars++
+            createCars();
+            break;
+        case 7:
+            numberOfSignals = 5;
+            createSignals();
+            break;
+        case 8:
+            carHitPenalty = 0.1;
+            break;
+        case 9:
+            numberOfSignals = 4;
+            createSignals();
+            break;
+        default:
+            if (level % 2 === 0) {
+                fieldDecayTime *= 0.8;
+            } else {
+                signalSpeed += 1;
+                createSignals();
+            }
+    }
+}
+
 function play() {
     if (blurred == true) {
         if (isMuted == false) {
@@ -334,8 +400,8 @@ function play() {
 
     g.move(player);
     g.contain(player, {
-        x: 18, y: 0,
-        width: g.canvas.width - 18,
+        x: 9, y: 0,
+        width: g.canvas.width - 9,
         height: g.canvas.height
     })
 
@@ -391,6 +457,10 @@ function play() {
         }
         lastTime = now;
     }
+    if (Math.floor((now - initialTime) / levelTime) > level) {
+        levelUpSound();
+        increaseLevel();
+    }
 
     if (healthBar.inner.width < 0 || !signalIndicator.strength) {
         g.state = end;
@@ -400,6 +470,7 @@ function play() {
 function end() {
     muteMusic();
     g.pause();
+    finalLevel.content = "level: " + level;
     totalScore.content = "total score: " + score;
     gameScene.visible = false;
     gameOverScene.visible = true;
