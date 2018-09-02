@@ -16,8 +16,7 @@ var player,
         300, 300, setup,
         [
             'images/bob.png',
-            'images/car.png',
-            'images/car2.png',
+            'images/cars.png',
         ]
     ),
     canvasW = g.canvas.width,
@@ -36,7 +35,7 @@ var player,
     fieldDecayTime = 3000,
     numberOfSignals = 7,
     numberOfCars = 1,
-    carHitPenalty = 0.08
+    carHitPenalty = 0.1
     ;
 
 function getDirection() {
@@ -226,7 +225,7 @@ function restartSignal(signal) {
 
 function createCar(carNumber) {
     var direction = carNumber % 2,
-        car = g.sprite(`images/car${direction ? '2' : ''}.png`),
+        car = g.sprite(direction ? g.frame('images/cars.png', 51, 0, 50, 72) : g.frame('images/cars.png', 0, 0, 50, 72)),
         carHeight = car.height,
         originalY = direction ? -carHeight : canvasH + carHeight,
         verticalSpacing = carNumber > 1 && Math.floor(carNumber / 2) * carHeight + canvasH * 0.4 || 0
@@ -251,9 +250,18 @@ function createCars() {
 }
 
 function increaseLevel() {
+    var levelDisplayX = levelDisplay.x,
+        levelDisplayY = levelDisplay.y;
     level++;
     levelDisplay.content = "level: " + level;
     signalIterval = 0;
+    levelDisplay.scaleY = levelDisplay.scaleX = 5;
+    g.stage.putCenter(levelDisplay, 0, 0);
+    setTimeout(() => {
+        levelDisplay.scaleY = levelDisplay.scaleX = 1;
+        levelDisplay.x = levelDisplayX;
+        levelDisplay.y = levelDisplayY;
+    }, 1000); 
 
     switch (level) {
         case 2:
@@ -359,8 +367,8 @@ function startGame() {
         };
     });
 
-    scoreDisplay = g.text("score: " + score, "10px impact", "black", 245, 5);
-    levelDisplay = g.text("lavel: " + level, "10px impact", "black", 245, 20);
+    scoreDisplay = g.text("score: " + score, "10px impact", "black", 240, 5);
+    levelDisplay = g.text("lavel: " + level, "10px impact", "black", 240, 20);
     gameScene.add(player, scoreDisplay, levelDisplay);
 
     createSignals();
@@ -372,6 +380,7 @@ function startGame() {
     finalLevel = g.text("", "15px impact", "black", 130, g.canvas.height / 2 + 10);
 
     gameOverScene = g.group(
+        g.rectangle(canvasW - 80, canvasH - 80, "rgba(255,255,255,0.5)", "black", 3, 40, 40),
         message,
         totalScore,
         finalLevel,
