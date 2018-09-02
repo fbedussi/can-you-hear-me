@@ -29,7 +29,6 @@ var player,
     level = 1,
     playerVelocity = 2,
 
-
     //Configuration
     levelTime = 15000,
     signalSpeed = 1,
@@ -39,9 +38,6 @@ var player,
     numberOfCars = 1,
     carHitPenalty = 0.08
     ;
-
-
-
 
 
 function setup() {
@@ -66,6 +62,8 @@ function setup() {
 }
 
 function startGame() {
+    var walkingAnimation = g.filmstrip('images/bob.png', 32, 32, 0);
+
     window.onclick = window.onkeyup = null;
     introScene.visible = false;
 
@@ -73,7 +71,6 @@ function startGame() {
 
     createCars();
 
-    var walkingAnimation = g.filmstrip('images/bob.png', 32, 32, 0);
     player = g.sprite(walkingAnimation);
     player.setPosition(0, 100);
     player.states = {
@@ -87,70 +84,54 @@ function startGame() {
         walkRight: [8, 11]
     };
     player.show(player.states.right);
-    leftArrow = g.keyboard(37);
-    upArrow = g.keyboard(38);
-    rightArrow = g.keyboard(39);
-    downArrow = g.keyboard(40);
-    leftArrow.press = function () {
-        player.playSequence(player.states.walkLeft);
-        player.vx = -playerVelocity;
-        player.vy = 0;
-    };
-    leftArrow.release = function () {
-        if (!rightArrow.isDown && player.vy === 0) {
-            player.vx = 0;
-            player.show(player.states.left);
-        }
-    };
-    upArrow.press = function () {
-        player.playSequence(player.states.walkUp);
-        player.vy = -playerVelocity;
-        player.vx = 0;
-    };
-    upArrow.release = function () {
-        if (!downArrow.isDown && player.vx === 0) {
-            player.vy = 0;
-            player.show(player.states.up);
-        }
-    };
-    rightArrow.press = function () {
-        player.playSequence(player.states.walkRight);
-        player.vx = playerVelocity;
-        player.vy = 0;
-    };
-    rightArrow.release = function () {
-        if (!leftArrow.isDown && player.vy === 0) {
-            player.vx = 0;
-            player.show(player.states.right);
-        }
-    };
-    downArrow.press = function () {
-        player.playSequence(player.states.walkDown);
-        player.vy = playerVelocity;
-        player.vx = 0;
-    };
-    downArrow.release = function () {
-        if (!upArrow.isDown && player.vx === 0) {
-            player.vy = 0;
-            player.show(player.states.down);
-        }
-    };
 
+    ['Left', 'Right'].forEach(direction => {
+        let oppositeDir = direction === 'Left' ? 'Right' : 'Left';
+        g.key[`${direction.toLowerCase()}Arrow`].press = function () {
+            player.playSequence(player.states[`walk${direction}`]);
+            player.vx = direction === 'Left' ? -playerVelocity : playerVelocity;
+            player.vy = 0;
+        }
+        g.key[`${direction.toLowerCase()}Arrow`].release = function () {
+            if (!g.key[`${oppositeDir.toLowerCase()}Arrow`].isDown && player.vy === 0) {
+                player.vx = 0;
+                player.show(player.states[direction.toLowerCase()]);
+            }
+        };
+    });
+    ['Up', 'Down'].forEach(direction => {
+        let oppositeDir = direction === 'Up' ? 'Down' : 'Up';
+        g.key[`${direction.toLowerCase()}Arrow`].press = function () {
+            player.playSequence(player.states[`walk${direction}`]);
+            player.vy = direction === 'Up' ? -playerVelocity : playerVelocity;
+            player.vx = 0;
+        }
+        g.key[`${direction.toLowerCase()}Arrow`].release = function () {
+            if (!g.key[`${oppositeDir.toLowerCase()}Arrow`].isDown && player.vx === 0) {
+                player.vy = 0;
+                player.show(player.states[direction.toLowerCase()]);
+            }
+        };
+    });
+    
     scoreDisplay = g.text("score: " + score, "10px impact", "black", 245, 5);
     levelDisplay = g.text("lavel: " + level, "10px impact", "black", 245, 20);
     gameScene.add(player, scoreDisplay, levelDisplay);
 
     createSignals();
-
     createHealthBar();
     createSignalIndicator();
 
     message = g.text("Game Over!", "30px impact", "black", 85, g.canvas.height / 2 - 64);
     totalScore = g.text("", "15px impact", "black", 110, g.canvas.height / 2 - 10);
     finalLevel = g.text("", "15px impact", "black", 130, g.canvas.height / 2 + 10);
-    var replay = g.text("click or enter to replay", "15px impact", "black", 85, g.canvas.height / 2 + 40);
 
-    gameOverScene = g.group(message, totalScore, finalLevel, replay);
+    gameOverScene = g.group(
+        message, 
+        totalScore, 
+        finalLevel, 
+        g.text("click or enter to replay", "15px impact", "black", 85, g.canvas.height / 2 + 40)
+    );
 
     gameOverScene.visible = false;
 
@@ -174,8 +155,8 @@ function play() {
     g.move(player);
     g.contain(player, {
         x: 9, y: 0,
-        width: g.canvas.width - 9,
-        height: g.canvas.height
+        width: canvasW - 9,
+        height: canvasH
     })
 
     var playerHit = false;
@@ -192,7 +173,7 @@ function play() {
     });
 
     if (playerHit) {
-        player.alpha = 0.5;
+        player.alpha = 0.3;
         dashSound();
         healthBar.inner.width -= carHitPenalty;
     } else {
@@ -241,8 +222,6 @@ function play() {
 }
 
 function end() {
-    muteMusic();
-    g.pause();
     finalLevel.content = "level: " + level;
     totalScore.content = "total score: " + score;
     gameScene.visible = false;
@@ -257,10 +236,17 @@ function end() {
     };
 }
 
-window.onblur = function () {
-    sequence1.gain.gain.value = 0
-    sequence2.gain.gain.value = 0
-    blurred = true
+window.onblur = function() {
+    sequence1.gain.gain.value = 0;
+    sequence2.gain.gain.value = 0;
+    blurred = true;
+    isMuted = true;
+}
+window.onfocus = function() {
+    sequence1.gain.gain.value = 0.1;
+    sequence2.gain.gain.value = 0.05;
+    blurred = false;
+    isMuted = false;
 }
 
 g.start();

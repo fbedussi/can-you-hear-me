@@ -1,31 +1,33 @@
 function makeSignal(speed) {
-    var _ = "transparent";
-    var i = "LightSkyBlue";
-    var c = "Turquoise";
-    var x = "SteelBlue";
-    var signal = drawSprite([
-        [_, _, _, _, i, _, _, _, _, _, _, i],
-        [_, _, i, i, _, _, _, _, _, _, _, _, i, i],
-        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i],
-        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i],
-        [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
-        [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],
-        [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
-        [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
-        [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
-        [i, _, c, _, _, x, _, _, _, _, x, _, c, c, _, i],
-        [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],
-        [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
-        [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i],
-        [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i],
-        [_, _, i, i, _, _, _, _, _, _, _, _, i, i],
-        [_, _, _, _, i, _, _, _, _, _, _, i],
-    ]);
+    var _ = "transparent",
+        i = "LightSkyBlue",
+        c = "Turquoise",
+        x = "SteelBlue",
+        signal = drawSprite([
+            [_, _, _, _, i, _, _, _, _, _, _, i],
+            [_, _, i, i, _, _, _, _, _, _, _, _, i, i],
+            [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i],
+            [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i],
+            [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
+            [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],
+            [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
+            [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
+            [i, _, c, _, x, x, _, x, x, _, x, x, _, c, _, i],
+            [i, _, c, _, _, x, _, _, _, _, x, _, c, c, _, i],
+            [i, _, c, c, _, x, x, _, _, x, _, _, c, c, _, i],
+            [i, _, _, c, _, _, _, _, _, _, _, _, c, _, _, i],
+            [_, i, _, _, c, c, _, _, _, _, c, c, _, _, i],
+            [_, i, i, _, _, c, _, _, _, _, c, _, _, i, i],
+            [_, _, i, i, _, _, _, _, _, _, _, _, i, i],
+            [_, _, _, _, i, _, _, _, _, _, _, i],
+        ]);
+
     signal.speed = speed;
     signal.x = g.randomInt(0, g.canvas.width);
     signal.y = g.randomInt(0, g.canvas.height);
     signal.vy = signal.speed * getDirection();
     signal.vx = signal.speed * getDirection();
+    
     setInterval(() => {
         if (signal.scaleX === 1) {
             signal.scaleX = signal.scaleY = 0.5;
@@ -45,17 +47,18 @@ function createSignalIndicator() {
         bar2 = g.rectangle(5, 7.5, barColor, "", 0, 24.5, 7.5),
         bar3 = g.rectangle(5, 10, barColor, "", 0, 32, 5),
         bar4 = g.rectangle(5, 12.5, barColor, "", 0, 39.5, 2.5),
-        maxSignalStrength = 4;
-    var X = barColor;
-    var _ = "transparent";
-    var antenna = drawSprite([
-        [X, _, _, X, _, _, X],
-        [_, X, _, X, _, X,],
-        [_, _, X, X, X],
-        [_, _, _, X],
-        [_, _, _, X],
-        [_, _, _, X],
-    ], 1.5);
+        maxSignalStrength = 4,
+        X = barColor,
+        _ = "transparent",
+        antenna = drawSprite([
+            [X, _, _, X, _, _, X],
+            [_, X, _, X, _, X,],
+            [_, _, X, X, X],
+            [_, _, _, X],
+            [_, _, _, X],
+            [_, _, _, X],
+        ], 1.5);
+
     antenna.x = 5;
     antenna.y = 6;
     signalIndicator = g.group(antenna, bar1, bar2, bar3, bar4);

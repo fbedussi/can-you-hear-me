@@ -19,17 +19,6 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         "E4 e",
         "E3 q"
     ],
-    cp = [
-        "B3 e",
-        "D4b e",
-        "D4 e",
-        "E4 e"
-    ],
-    dd = [
-        "E0 e",
-        "F0 e",
-        "E0 h",
-    ],
     ee = [
         "E2 q",
         "E5 q"
@@ -145,19 +134,3 @@ function playAt(speed) {
 }
 
 isMuted = false
-
-function muteMusic() {
-    if (isMuted == true) {
-        sequence1.gain.gain.value = 0.1;
-        sequence2.gain.gain.value = 0.05
-        coinTake.gain.gain.value = 0.1;
-        s_dash.gain.gain.value = 0.1;
-        isMuted = false
-    } else {
-        sequence1.gain.gain.value = 0
-        sequence2.gain.gain.value = 0
-        coinTake.gain.gain.value = 0
-        s_dash.gain.gain.value = 0
-        isMuted = true
-    }
-}

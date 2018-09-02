@@ -1017,37 +1017,7 @@ GA.create = function(width, height, setup, assetsToLoad, load) {
     }
   };
 
-  //### makeCircular
-  //The `makeCircular` function is run whenever a sprite's `circular`
-  //property is set to `true`.
-  //Add `diameter` and `radius` properties to circular sprites.
-  function makeCircular(o) {
-    Object.defineProperties(o, {
-      diameter: {
-        get: function() {
-          return o.width;
-        },
-        set: function(value) {
-          o.width = value;
-          o.height = value;
-        },
-        enumerable: true,
-        configurable: true
-      },
-      radius: {
-        get: function() {
-          return o.width / 2;
-        },
-        set: function(value) {
-          o.width = value * 2;
-          o.height = value * 2;
-        },
-        enumerable: true,
-        configurable: true
-      }
-    });
-  }
-
+  
   //### makeStage
   //`makeStage` is called when Ga initializes. It creates a group
   //object called `stage` which will become the parent of all the other sprites
@@ -1224,61 +1194,6 @@ GA.create = function(width, height, setup, assetsToLoad, load) {
     //Return the rectangle.
     return o;
   };
-
-  //### circle
-  //`circle` returns a basic colored circle.
-  //arguments: diameter, fillColor, outlineColor, borderColor,
-  //xPosition, yPosition
-  ga.circle = function(diameter, fillStyle, strokeStyle, lineWidth, x, y) {
-    var o = {};
-
-    //Make this a display object.
-    makeDisplayObject(o);
-
-    //Add a mask property.
-    o.mask = false;
-
-    //Set the defaults.
-    o.width = diameter || 32;
-    o.height = diameter || 32;
-    o.fillStyle = fillStyle || "red";
-    o.strokeStyle = strokeStyle || "none";
-    o.lineWidth = lineWidth || "none";
-    o.x = x || 0;
-    o.y = y || 0;
-
-    //Add the sprite to the stage.
-    ga.stage.addChild(o);
-
-    //Add `diameter` and `radius` getters and setters.
-    makeCircular(o);
-
-    //Add a `render` method that explains to the canvas how to draw
-    //a circle.
-    o.render = function(ctx) {
-      ctx.strokeStyle = o.strokeStyle;
-      ctx.lineWidth = o.lineWidth;
-      ctx.fillStyle = o.fillStyle;
-      ctx.beginPath();
-      ctx.arc(
-        o.radius + (-o.diameter * o.pivotX),
-        o.radius + (-o.diameter * o.pivotY),
-        o.radius,
-        0, 2 * Math.PI, false
-      );
-      if (o.mask === true) {
-        ctx.clip();
-      } else {
-        if (o.strokeStyle !== "none") ctx.stroke();
-        if (o.fillStyle !== "none") ctx.fill();
-      }
-    };
-
-    //Return the circle sprite.
-    return o;
-  };
-
-  
 
   //### text
   //`text` creates and returns a single line of dynamic text.

@@ -28,6 +28,4 @@ function createBackground() {
     for (let i = 0; i < 6; i++) {
         background.add(g.rectangle(4, 30, "white", "", 0, (canvasW - 4) / 2, 10 + i * (30 + 20)));
     }
-
-    //gameScene.addChild(background);
 }
