@@ -1,4 +1,4 @@
-# Can you head me?
+# Can you hear me?
 
 A 2D game for the js13k game jam. 
 
