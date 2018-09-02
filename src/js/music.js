@@ -103,10 +103,7 @@ sequence1.staccato = 0.55;
 sequence2.staccato = 0.55;
 
 // adjust the levels
-sequence1.gain.gain.value = 0.1;
-sequence2.gain.gain.value = 0.05
-coinTake.gain.gain.value = 0.1;
-s_dash.gain.gain.value = 0.1;
+setLevels();
 
 /*
   Audio utilities
@@ -133,4 +130,22 @@ function playAt(speed) {
     sequence2.play(ac.currentTime);
 }
 
-isMuted = false
+function setLevels() {
+    sequence1.gain.gain.value = 0.1;
+    sequence2.gain.gain.value = 0.05
+    coinTake.gain.gain.value = 0.1;
+    levelUp.gain.gain.value = 0.1;
+    s_dash.gain.gain.value = 0.1;
+    isMuted = false
+}
+
+function muteSound() {
+    sequence1.gain.gain.value = 0;
+    sequence2.gain.gain.value = 0;
+    coinTake.gain.gain.value = 0;
+    levelUp.gain.gain.value = 0;
+    s_dash.gain.gain.value = 0;
+
+    isMuted = true;
+}
+
