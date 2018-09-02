@@ -5,7 +5,8 @@
   "scripts": {
     "test": "gulp test",
     "build": "gulp build",
-    "watch": "gulp"
+    "watch": "gulp",
+    "run": "live-server src"
   },
   "author": "Francesco Bedussi",
   "license": "MIT",

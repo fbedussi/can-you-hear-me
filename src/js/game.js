@@ -21,7 +21,7 @@ var player,
     ),
     canvasW = g.canvas.width,
     canvasH = g.canvas.height,
-    initialTime = Date.now(),
+    initialTime,
     lastTime,
     blurred = false,
     score = 0,
@@ -32,10 +32,10 @@ var player,
     levelTime = 15000,
     signalSpeed = 1,
     signalIterval = 2000,
-    fieldDecayTime = 3000,
-    numberOfSignals = 7,
+    fieldDecayTime = 2500,
+    numberOfSignals = 6,
     numberOfCars = 1,
-    carHitPenalty = 0.1
+    carHitPenalty = 0.15
     ;
 
 function getDirection() {
@@ -305,8 +305,8 @@ function setup() {
         g.text("now you have to run after the signal", "11px impact", "black", 50, 125),
         g.text("to prevent going offline...", "11px impact", "black", 50, 140),
         g.text("but pay attention not to be", "11px impact", "black", 50, 155),
-        g.text("knocked down by a car!", "11px impact", "black", 50, 170),
-        g.text("good luck!", "11px impact", "black", 50, 200)
+        g.text("knocked down by a car! Good luck!", "11px impact", "black", 50, 170),
+        g.text("Click or press any key to start", "11px impact", "black", 50, 200)
     );
 
     g.state = intro;
@@ -389,6 +389,7 @@ function startGame() {
 
     gameOverScene.visible = false;
 
+    initialTime = Date.now();
     g.state = play;
 }
 
