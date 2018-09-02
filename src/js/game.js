@@ -3,7 +3,6 @@ var player,
     signals = [],
     message,
     introScene,
-    gameScene,
     gameOverScene,
     scoreDisplay,
     levelDisplay,
@@ -19,6 +18,8 @@ var player,
             'images/cars.png',
         ]
     ),
+    gameScene,
+    carsGroup,
     canvasW = g.canvas.width,
     canvasH = g.canvas.height,
     initialTime,
@@ -166,7 +167,7 @@ function makeSignal(speed) {
 }
 
 function createSignalIndicator() {
-    var barColor = 'brown',
+    var barColor = 'red',
         bar1 = g.rectangle(5, 5, barColor, "", 0, 17, 10),
         bar2 = g.rectangle(5, 7.5, barColor, "", 0, 24.5, 7.5),
         bar3 = g.rectangle(5, 10, barColor, "", 0, 32, 5),
@@ -238,12 +239,13 @@ function createCar(carNumber) {
     car.vy = direction ? 2 : -2;
     car.originalY = originalY;
     cars.push(car);
-    gameScene.addChild(car);
+    carsGroup.addChild(car);
 }
 
 function createCars() {
     g.remove(cars);
     cars = [];
+    
     for (let i = 0; i < numberOfCars; i++) {
         createCar(i);
     }
@@ -319,9 +321,10 @@ function startGame() {
 
     window.onclick = window.onkeyup = null;
     introScene.visible = false;
+    
+    gameScene = g.group(),
 
-    gameScene = g.group();
-
+    carsGroup = g.group(),
     createCars();
 
     player = g.sprite(walkingAnimation);
@@ -367,9 +370,16 @@ function startGame() {
         };
     });
 
-    scoreDisplay = g.text("score: " + score, "10px impact", "black", 240, 5);
-    levelDisplay = g.text("lavel: " + level, "10px impact", "black", 240, 20);
-    gameScene.add(player, scoreDisplay, levelDisplay);
+    
+    scoreDisplay = g.text("score: " + score, "10px impact", "white", 130, 6);
+    levelDisplay = g.text("lavel: " + level, "10px impact", "white", 200, 6);
+    gameScene.add(
+        player,
+        carsGroup,
+        g.rectangle(canvasW, 25, "rgba(0,0,0,0.3)", "", 0, 0, 0),
+        scoreDisplay,
+        levelDisplay
+    );
 
     createSignals();
     createHealthBar();
