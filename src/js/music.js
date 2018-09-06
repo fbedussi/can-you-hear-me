@@ -8,6 +8,8 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
     // initialize some vars
     sequence1,
     sequence2,
+    sequence3,
+    tempo = 136,
     coinTake,
     s_dash,
     // create an array of "note strings" that can be passed to a sequence
@@ -24,64 +26,65 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         "E5 q"
     ],
     lead = [
-        'D3  q',
-        '-   h',
-        'D3  q',
-
-        'A2  q',
-        '-   h',
-        'A2  q',
-
-        'A1b e',
-        'B0 e',
-        'E1 e',
-        'D2 e',
-        'D3 e',
-        'A1 e',
-        'D3 e',
+        '-   e',
+        'G4  e',
+        'C4  e',
+        'F4  e',
+        '-   e',
+        'F4  e',
+        'G4  e',
+        'C4  e',
+        
+        '-   e',
+        'C5  e',
+        'F4  e',
+        'G4  e',
+        '-   e',
+        'F4  e',
+        'C5  e',
+        'F4  e'
     ],
     harmony = [
+        'C5  e',
         '-   e',
-        'D4  e',
-        'C4  e',
-        'D4  e',
-        'Bb3 e',
-        'C4  e',
-        'A3  e',
-        'Bb3 e',
-
-        'G3  e',
-        'A3  e',
-        'Bb3 e',
-        'A3  e',
-        'G3  e',
-        'A3  e',
-        'F3  q',
-
+        'G5  e',
         '-   e',
-        'D4  s',
-        'C4  s',
-        'D4  e',
-        'Bb3 e',
-        'C4  e',
-        'Bb3 e',
-        'A3  e',
-        'Bb3 e',
+        'F5  e',
+        '-   e',
+        'C5  e',
+        '-   e',
+      
+        'F5  e',
+        '-   e',
+        'C5  e',
+        '-   e',
+        'G5  e',
+        '-   e',
+        'F5  e',
+        '-   e'
+      ],
+      bass = [
+        'C3  e',
+        'F2  q',
+        '-   e',
+      
+        'G2  e',
+        'F2  q',
+        '-   e',
+        
+        'F2  e',
+        'C3  q',
+        '-   e',
+      
+        'C3  e',
+        'F2  q',
+        '-   e'
+      ];
 
-        'G3  e',
-        'A3  e',
-        'Bb3 e',
-        'A3  e',
-        'G3  s',
-        'A3  s',
-        'G3  e',
-        'F3  q'
-
-    ],
-
-    // create 2 new sequences (one for lead, one for harmony)
-    sequence1 = new TinyMusic.Sequence(ac, 100, lead);
-sequence2 = new TinyMusic.Sequence(ac, 100, harmony);
+// create 2 new sequences (one for lead, one for harmony)
+sequence1 = new TinyMusic.Sequence(ac, tempo, lead);
+sequence2 = new TinyMusic.Sequence(ac, tempo, harmony);
+sequence3 = new TinyMusic.Sequence( ac, tempo, bass );
 
 coinTake = new TinyMusic.Sequence(ac, 100, cc);
 coinTake.loop = false
@@ -99,8 +102,9 @@ s_dash.tempo = 300
 s_dash.smoothing = 1;
 
 // set staccato values for maximum coolness
-sequence1.staccato = 0.55;
-sequence2.staccato = 0.55;
+sequence1.staccato = 0.3;
+sequence2.staccato = 0.1;
+sequence3.staccato = 0.5;
 
 // adjust the levels
 setLevels();
@@ -124,24 +128,26 @@ function dashSound() {
 function playAt(speed) {
     sequence1.stop();
     sequence2.stop();
-    sequence1.tempo = speed
-    sequence2.tempo = speed
-    sequence1.play(ac.currentTime);
-    sequence2.play(ac.currentTime);
+    sequence3.stop();
+    sequence1.play( ac.currentTime );
+    sequence2.play( ac.currentTime + ( 60 / tempo ) * 16 );
+    sequence3.play( ac.currentTime + ( 60 / tempo ) * 16 );
 }
 
 function setLevels() {
-    sequence1.gain.gain.value = 0.1;
-    sequence2.gain.gain.value = 0.05
-    coinTake.gain.gain.value = 0.1;
-    levelUp.gain.gain.value = 0.1;
-    s_dash.gain.gain.value = 0.1;
+    sequence1.gain.gain.value = 0.2;
+    sequence2.gain.gain.value = 0.2;
+    sequence3.gain.gain.value = 0.15;
+    coinTake.gain.gain.value = 0.3;
+    levelUp.gain.gain.value = 0.3;
+    s_dash.gain.gain.value = 0.3;
     isMuted = false
 }
 
 function muteSound() {
     sequence1.gain.gain.value = 0;
     sequence2.gain.gain.value = 0;
+    sequence3.gain.gain.value = 0;
     coinTake.gain.gain.value = 0;
     levelUp.gain.gain.value = 0;
     s_dash.gain.gain.value = 0;
