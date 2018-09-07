@@ -372,7 +372,7 @@ function startGame() {
 
     
     scoreDisplay = g.text("score: " + score, "10px impact", "white", 130, 6);
-    levelDisplay = g.text("lavel: " + level, "10px impact", "white", 200, 6);
+    levelDisplay = g.text("level: " + level, "10px impact", "white", 200, 6);
     gameScene.add(
         player,
         carsGroup,
