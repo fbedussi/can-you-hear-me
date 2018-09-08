@@ -6,6 +6,7 @@ This part is partially copied from the TinyMusic example.
 // create the audio context
 var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudioContext,
     // initialize some vars
+    sequenceIntro,
     sequence1,
     sequence2,
     sequence3,
@@ -25,6 +26,25 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         "E2 q",
         "E5 q"
     ],
+    introLoop = [
+        '-   e',
+        'G4  e',
+        'C4  e',
+        'F4  e',
+        '-   e',
+        'F4  e',
+        'G4  e',
+        'C4  e',
+        
+        '-   e',
+        'C5  e',
+        'F4  e',
+        'G4  e',
+        '-   e',
+        'F4  e',
+        'C5  e',
+        'F4  e',
+    ],
     lead = [
         '-   e',
         'G4  e',
@@ -42,6 +62,24 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         '-   e',
         'F4  e',
         'C5  e',
+        'F4  e',
+
+        '-   e',
+        'F4  e',
+        'G4  e',
+        'F4  e',
+        '-   e',
+        'E4  e',
+        'C4  e',
+        'C4  e',
+        
+        '-   e',
+        'E4 e',
+        'F4  e',
+        'C4  e',
+        '-   e',
+        'F4  e',
+        'G4  e',
         'F4  e'
     ],
     harmony = [
@@ -55,6 +93,24 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
         '-   e',
       
         'F5  e',
+        '-   e',
+        'C5  e',
+        '-   e',
+        'G5  e',
+        '-   e',
+        'F5  e',
+        '-   e',
+
+        'E5  e',
+        '-   e',
+        'G5  e',
+        '-   e',
+        'C6  e',
+        '-   e',
+        'F5  e',
+        '-   e',
+      
+        'A5  e',
         '-   e',
         'C5  e',
         '-   e',
@@ -78,10 +134,27 @@ var ac = typeof AudioContext !== 'undefined' ? new AudioContext : new webkitAudi
       
         'C3  e',
         'F2  q',
+        '-   e',
+
+        'A2  e',
+        'F2  q',
+        '-   e',
+      
+        'C3  e',
+        'E2  q',
+        '-   e',
+        
+        'G2  e',
+        'F2  q',
+        '-   e',
+      
+        'A2  e',
+        'F2  q',
         '-   e'
       ];
 
 // create 2 new sequences (one for lead, one for harmony)
+sequenceIntro = new TinyMusic.Sequence(ac, tempo, introLoop);
 sequence1 = new TinyMusic.Sequence(ac, tempo, lead);
 sequence2 = new TinyMusic.Sequence(ac, tempo, harmony);
 sequence3 = new TinyMusic.Sequence( ac, tempo, bass );
@@ -102,6 +175,7 @@ s_dash.tempo = 300
 s_dash.smoothing = 1;
 
 // set staccato values for maximum coolness
+sequenceIntro.staccato = 0.3;
 sequence1.staccato = 0.3;
 sequence2.staccato = 0.1;
 sequence3.staccato = 0.5;
@@ -125,16 +199,24 @@ function dashSound() {
 }
 
 //call this to play the sequences at the desired speed
-function playAt(speed) {
+function playIntro() {
+    sequenceIntro.stop();
+    sequenceIntro.play(ac.currentTime);
+}
+
+function playMainTheme() {
+    var now = ac.currentTime;
+    sequenceIntro.stop();
     sequence1.stop();
     sequence2.stop();
     sequence3.stop();
-    sequence1.play( ac.currentTime );
-    sequence2.play( ac.currentTime + ( 60 / tempo ) * 16 );
-    sequence3.play( ac.currentTime + ( 60 / tempo ) * 16 );
+    sequence1.play( now );
+    sequence2.play( now );
+    sequence3.play( now );
 }
 
 function setLevels() {
+    sequenceIntro.gain.gain.value = 0.2;
     sequence1.gain.gain.value = 0.2;
     sequence2.gain.gain.value = 0.2;
     sequence3.gain.gain.value = 0.15;
@@ -145,6 +227,7 @@ function setLevels() {
 }
 
 function muteSound() {
+    sequenceIntro.gain.gain.value = 0;
     sequence1.gain.gain.value = 0;
     sequence2.gain.gain.value = 0;
     sequence3.gain.gain.value = 0;

@@ -313,10 +313,11 @@ function setup() {
 
     g.state = intro;
 
-    playAt(150);
+    playIntro();
 }
 
 function startGame() {
+    playMainTheme();
     var walkingAnimation = g.filmstrip('images/bob.png', 32, 32, 0);
 
     window.onclick = window.onkeyup = null;
