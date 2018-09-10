@@ -323,9 +323,9 @@ function startGame() {
     window.onclick = window.onkeyup = null;
     introScene.visible = false;
     
-    gameScene = g.group(),
-
-    carsGroup = g.group(),
+    gameScene = g.group();
+    carsGroup = g.group();
+    
     createCars();
 
     player = g.sprite(walkingAnimation);
